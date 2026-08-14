@@ -54,7 +54,7 @@ public struct BaseResponse<Value: Decodable & Sendable>: Decodable, Sendable {
 /// Represents an empty payload for responses that do not return a body.
 /// This type is useful when the backend still wraps the response in a `BaseResponse`
 /// but there is no meaningful data to decode.
-public struct EmptyResponseBody: Codable, Sendable {
+nonisolated public struct EmptyResponseBody: Codable, Sendable {
   /// Creates a new instance of `EmptyResponseBody`.
   public init() { }
 }
