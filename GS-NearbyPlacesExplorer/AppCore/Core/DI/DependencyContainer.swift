@@ -16,7 +16,7 @@ public final class DependencyContainer: @unchecked Sendable {
   // MARK: - Types
 
   /// A unique key used to identify a registered service entry.
-  private struct ServiceKey: Hashable, Sendable {
+  nonisolated private struct ServiceKey: Hashable, Sendable {
     /// The identifier of the service type.
     let type: ObjectIdentifier
     /// An optional registration name to distinguish multiple bindings of the same type.
