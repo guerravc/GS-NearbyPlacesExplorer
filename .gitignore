@@ -1,0 +1,10 @@
+# AIAS and Antigravity specific files
+.agents/
+aias-config/
+aias/
+.gitmodules
+AGENTS.md
+RHOAIAS.md
+stack-profile.md
+stack-fragment.md
+.rhoaias/
