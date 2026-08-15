@@ -7,124 +7,46 @@
 
 import Foundation
 
-/// Default repository implementation for the Login module.
-///
-/// This type implements the domain `LoginGateway` protocol and
-/// coordinates the remote service and local storage layers. It is responsible for:
-/// - Calling the remote data source (service) and interpreting `BaseResponse`
-///   envelopes returned by the backend.
-/// - Mapping DTOs to domain entities.
-/// - Optionally caching entities in the local storage.
-/// - Mapping infrastructure errors (network, backend) into domain-friendly errors.
-public enum LoginRepositoryError: Error, @unchecked Sendable {
-  /// Represents an error payload returned by the backend.
-  case backend(ErrorResponse)
-  /// Represents a networking or low-level error.
-  case network(Error)
-  /// Indicates that the backend response did not contain the expected object.
-  case emptyResponseObject
-}
-
 /// Default implementation of the module gateway, backed by a remote service
-/// and an optional local storage.
+/// and a local storage.
 public final class DefaultLoginRepository: LoginGateway {
 
-  // MARK: - Dependencies
+  /// The remote data source used to authenticate the user.
+  @Inject var remoteDataSource: LoginRemoteDataSource
+  /// The local data source used to persist the authentication token.
+  @Inject var localDataSource: LoginLocalDataSource
 
-  private let remoteDataSource: LoginRemoteDataSource
-  private let localDataSource: LoginLocalDataSource
+  /// Initializes a new instance of `DefaultLoginRepository`.
+  public init() {}
 
-  // MARK: - Init
-
-  /// Creates a new repository instance.
-  ///
-  /// - Parameters:
-  ///   - remoteDataSource: Remote data source used to perform backend requests.
-  ///   - localDataSource: Local data source used to cache or retrieve entities.
-  public init(
-    remoteDataSource: LoginRemoteDataSource,
-    localDataSource: LoginLocalDataSource
-  ) {
-    self.remoteDataSource = remoteDataSource
-    self.localDataSource = localDataSource
-  }
-
-  // MARK: - LoginGateway
-
-  /// Fetches data for the given request by delegating to the remote data source
-  /// and interpreting the backend `BaseResponse` envelope.
-  ///
-  /// - Parameter request: Request model to be sent to the backend.
-  /// - Returns: A result containing the module response or an error.
-  public func fetch(
-    _ request: LoginRequest
-  ) async -> Result<LoginResponse, Error> {
+  /// Authenticates the user and saves the session token locally.
+  /// - Parameter presenting: The view controller to present the authentication UI on.
+  /// - Returns: A result containing the authenticated `LoginEntity` or an error.
+  public func signIn(presenting: Any) async -> Result<LoginEntity, Error> {
     do {
-      let baseResponse = try await remoteDataSource.fetch(request)
-
-      guard baseResponse.isSuccessful else {
-        let errorResponse = ErrorResponse(
-          status: baseResponse.status,
-          message: baseResponse.message,
-          code: nil
-        )
-        return .failure(LoginRepositoryError.backend(errorResponse))
-      }
-
-      guard let responseDTO = baseResponse.object else {
-        return .failure(LoginRepositoryError.emptyResponseObject)
-      }
-
-      let response = responseDTO.toDomain()
-
-      do {
-        try await localDataSource.save(response.entity)
-      } catch {
-        Log.warning(
-          "Failed to cache entity after fetch: \(error.localizedDescription)",
-          instance: self
-        )
-      }
-
-      return .success(response)
+      let dto = try await remoteDataSource.signIn(presenting: presenting)
+      // Save token (using ID as a mock token since GoogleSignIn handles its own token)
+      try localDataSource.saveToken(dto.id)
+      return .success(dto.toDomain())
     } catch {
-      return .failure(LoginRepositoryError.network(error))
+      return .failure(error)
     }
   }
 
-  /// Persists the given entity by delegating to the remote data source and
-  /// optionally updating the local storage.
-  ///
-  /// - Parameter entity: The entity to be persisted.
-  /// - Returns: A result indicating whether the operation succeeded or failed.
-  public func persist(
-    _ entity: LoginEntity
-  ) async -> Result<Void, Error> {
+  /// Attempts to silently restore a previously authenticated session.
+  /// Checks local storage first before calling the remote data source.
+  /// - Returns: A result containing the restored `LoginEntity` or an error.
+  public func restoreSignIn() async -> Result<LoginEntity, Error> {
     do {
-      let dto = LoginEntityDTO(entity: entity)
-      let baseResponse = try await remoteDataSource.persist(dto)
-
-      guard baseResponse.isSuccessful else {
-        let errorResponse = ErrorResponse(
-          status: baseResponse.status,
-          message: baseResponse.message,
-          code: nil
-        )
-        return .failure(LoginRepositoryError.backend(errorResponse))
+      // Check if we have a token stored locally before calling remote
+      guard let _ = try localDataSource.getToken() else {
+          return .failure(AuthError.unknown)
       }
-
-      do {
-        try await localDataSource.save(entity)
-      } catch {
-        Log.warning(
-          "Failed to cache entity after persist: \(error.localizedDescription)",
-          instance: self
-        )
-      }
-
-      return .success(())
+      
+      let dto = try await remoteDataSource.restoreSignIn()
+      return .success(dto.toDomain())
     } catch {
-      return .failure(LoginRepositoryError.network(error))
+      return .failure(error)
     }
   }
 }
