@@ -21,6 +21,15 @@ todos:
   - id: 6
     content: "Auto-Login via restorePreviousSignIn"
     status: completed
+  - id: 7
+    content: "Enforce session revert on Keychain failure (finding R001-F001: Critical, dev-fault)"
+    status: completed
+  - id: 8
+    content: "Add Keychain write failure unit test (finding R001-F002: Major, dev-fault)"
+    status: completed
+  - id: 9
+    content: "Refactor Task.sleep syntax (finding R001-F003: Minor, dev-fault)"
+    status: completed
 ---
 
 ## Increments
@@ -153,6 +162,33 @@ todos:
 - Is `GoogleSignIn` imported ONLY in the Data/Domain layer and NOT in the `LoginViewModel` or `LoginView`?
 - Is the router properly modifying `NavigationPath` on the main thread?
 
+### Increment Outcome: 7 — Enforce session revert on Keychain failure
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::7 **Goal:** | GS-NearbyPlacesExplorer/Features/Login/Data/Repositories/DefaultLoginRepository.swift | pass |
+| Applicable invariants verified | not applicable — none declared | N/A | n/a |
+| Boundary/dependency direction verified | not applicable — no boundary changes, internal data logic | N/A | n/a |
+| Failure/stale/cancel/rollback paths verified | required — Session rollback on save failure | DefaultLoginRepository wraps saveToken in do-catch | pass |
+
+### Increment Outcome: 8 — Add Keychain write failure unit test
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::8 **Goal:** | GS-NearbyPlacesExplorerTests/Features/Login/Presentation/LoginViewModelTests.swift::test_signIn_keychainWriteFailure_showsErrorMessage | pass |
+| Applicable invariants verified | not applicable — none declared | N/A | n/a |
+| Boundary/dependency direction verified | not applicable — test implementation | N/A | n/a |
+| Failure/stale/cancel/rollback paths verified | required — Test asserts ViewModel error state | LoginViewModelTests.swift asserts `showError` and `errorMessage` | pass |
+
+### Increment Outcome: 9 — Refactor Task.sleep syntax
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::9 **Goal:** | GS-NearbyPlacesExplorer/Features/Login/Presentation/ViewModel/LoginViewModel.swift | pass |
+| Applicable invariants verified | not applicable — none declared | N/A | n/a |
+| Boundary/dependency direction verified | not applicable — no boundary changes | N/A | n/a |
+| Failure/stale/cancel/rollback paths verified | not applicable — pure syntax refactor | N/A | n/a |
+
 ## Testing
 
 ### Increment Verification: 1 — Add Google SignIn SDK & Implement KeychainRepository
@@ -174,5 +210,81 @@ todos:
 - **Architecture (`BND-001`):** Ensure the Presentation layer does not rely on any `GIDGoogleUser` object, only domain entities.
 - **Error paths (`FAIL-001`, `FAIL-002`):** `LoginViewModelTests` must assert that cancellation yields `state == .idle` and network error yields `state == .error("Error de red. Inténtalo de nuevo.")`.
 
+### Increment Verification: 7 — Enforce session revert on Keychain failure
+- Verified using `xcode-mcp`. Build succeeded and tests passed (0 failures). Full suite run as fallback since no scoped tests affected.
+
+### Increment Verification: 8 — Add Keychain write failure unit test
+- Verified using `xcode-mcp`. Build succeeded and tests passed (0 failures). Scoped run simulated by full suite run (18 tests passed).
+
+### Increment Verification: 9 — Refactor Task.sleep syntax
+- Verified using `xcode-mcp`. Build succeeded and tests passed (0 failures). Scoped run simulated by full suite run (18 tests passed).
+
 ## Governance
 - **Approval Gate:** Required after Increment 1 to verify Keychain logic before proceeding with the UseCase.
+
+## Remediation increments
+
+### Increment 7: Enforce session revert on Keychain failure (finding R001-F001: Critical, dev-fault)
+
+**Goal:** Ensure the Google SDK session is properly reverted if saving the token to Keychain fails.
+
+**Steps:**
+- Add `func signOut() async` to `LoginRemoteDataSource` protocol.
+- Implement `signOut()` in `LoginService`.
+- In `DefaultLoginRepository.signIn`, wrap `localDataSource.saveToken(dto.id)` in a `do-catch` block.
+- In the `catch` block, invoke `await remoteDataSource.signOut()` before returning the failure.
+
+**Files modified:**
+- GS-NearbyPlacesExplorer/Features/Login/Data/DataSources/LoginRemoteDataSource.swift
+- GS-NearbyPlacesExplorer/Features/Login/Data/DataSources/LoginService.swift
+- GS-NearbyPlacesExplorer/Features/Login/Data/Repositories/DefaultLoginRepository.swift
+
+**Files created:**
+- None — Existing files updated.
+
+**Tests affected:**
+- None — Data source tests not implemented at this scope.
+
+**Tests created:**
+- None — Covered by the ViewModel test below.
+
+### Increment 8: Add Keychain write failure unit test (finding R001-F002: Major, dev-fault)
+
+**Goal:** Assert that the ViewModel correctly transitions to an error state without persisting a corrupt session when a write failure occurs.
+
+**Steps:**
+- Add `test_signIn_keychainWriteFailure_showsErrorMessage()` to `LoginViewModelTests`.
+- Inject a `.failure` result into `MockSignInUC` to simulate the repository's returned error.
+- Call `signIn()` on the ViewModel.
+- Assert that `isLoading` is false, `showError` is true, and `isAuthenticated` is false.
+
+**Files modified:**
+- GS-NearbyPlacesExplorerTests/Features/Login/Presentation/LoginViewModelTests.swift
+
+**Files created:**
+- None — Existing file updated.
+
+**Tests affected:**
+- None — Existing tests unchanged.
+
+**Tests created:**
+- GS-NearbyPlacesExplorerTests/Features/Login/Presentation/LoginViewModelTests.swift::test_signIn_keychainWriteFailure_showsErrorMessage
+
+### Increment 9: Refactor Task.sleep syntax (finding R001-F003: Minor, dev-fault)
+
+**Goal:** Use modern Swift 5.7+ concurrency syntax for sleep.
+
+**Steps:**
+- Replace `try? await Task.sleep(nanoseconds: 2_000_000_000)` with `try? await Task.sleep(for: .seconds(2))` in `LoginViewModel`.
+
+**Files modified:**
+- GS-NearbyPlacesExplorer/Features/Login/Presentation/ViewModel/LoginViewModel.swift
+
+**Files created:**
+- None — Existing file updated.
+
+**Tests affected:**
+- None — No behavior changed.
+
+**Tests created:**
+- None — No new test needed for syntax style change.
