@@ -53,7 +53,7 @@ final class LoginViewModel {
             isAuthenticated = true
             
             // Add a small delay for UX so the user can see the spinner and transition smoothly
-            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            try? await Task.sleep(for: .seconds(2))
             
             withAnimation {
                 router.root = .main
