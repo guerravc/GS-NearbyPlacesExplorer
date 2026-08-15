@@ -33,9 +33,22 @@
 		AEF5440E302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GS-NearbyPlacesExplorerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AE4CA62F3030059F00FFE2FE /* Exceptions for "GS-NearbyPlacesExplorer" folder in "GS-NearbyPlacesExplorer" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				App/Info.plist,
+			);
+			target = AEF543F4302E8694000A6CB0 /* GS-NearbyPlacesExplorer */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AEF543F7302E8694000A6CB0 /* GS-NearbyPlacesExplorer */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AE4CA62F3030059F00FFE2FE /* Exceptions for "GS-NearbyPlacesExplorer" folder in "GS-NearbyPlacesExplorer" target */,
+			);
 			path = "GS-NearbyPlacesExplorer";
 			sourceTree = "<group>";
 		};
