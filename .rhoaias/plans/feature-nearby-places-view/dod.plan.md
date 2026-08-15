@@ -1,0 +1,12 @@
+- [ ] La UI está orquestada por un contenedor superior (`NavigationStack`) que posee el `searchable` (Placeholder: "Buscar lugares cercanos") y aloja el `TabView`.
+- [ ] La aplicación solicita permisos de ubicación; ante denegación muestra el alert exacto "Ubicación necesaria" con instrucciones a Preferencias.
+- [ ] Existe un botón global de Logout (`rectangle.portrait.and.arrow.right`) anclado a la navegación superior derecha.
+- [ ] El envío de búsqueda (`onSubmit`) muestra un overlay con `ProgressView` que deshabilita la interacción general.
+- [ ] Existe un diccionario/mapeador técnico que convierte `MKPointOfInterestCategory` a nombres de SF Symbols específicos (ej. `restaurant` -> `fork.knife`).
+- [ ] El mapa grafica pines utilizando el SF Symbol derivado de su categoría, con botón flotante `location.fill` para recentrar.
+- [ ] La celda de lista sigue estrictamente las specs visuales (fondo `Color.red.opacity(0.15)`, radius 8, icono `Color.red`, título `headline`, subtítulo `subheadline` gris, `chevron.right`).
+- [ ] El subtítulo muestra la métrica de distancia exacta y aplica los copies "Abierto", "Cerrado", o "Horario no disponible".
+- [ ] Empty States y Errores de Red muestran en pantalla los copies exactos definidos en los requerimientos de Producto.
+- [ ] Hacer tap en un marcador o celda acciona el enrutamiento (`NavigationLink`) hacia `AboutThePlaceView`.
+- [ ] El ViewModel dispone de pruebas unitarias validando estados y el Helper/Mapper de Iconos dispone de tests validando las conversiones.
+- [ ] El código compila sin errores ni advertencias bajo el standard de Swift 6.
