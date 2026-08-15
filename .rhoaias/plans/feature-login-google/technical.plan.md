@@ -57,6 +57,25 @@ todos:
     source_artifact: technical.plan.md
     source_section: "## Proposed DoD Amendments"
     source_bullet: "- **Test criteria**: Verify Keychain write failure."
+  - id: "val-renumber-increments"
+    content: "Renumber increments — non-consecutive numbering and/or alphabetic suffixes detected."
+    status: completed
+    kind: validation
+    artifact: increments.plan.md
+    dimension: Planning
+    proposed_resolution: |
+      Rename headings in document order:
+        - '### Increment 6: Enforce session revert on Keychain failure (finding R001-F001: Critical, dev-fault)' -> '### Increment 7: Enforce session revert on Keychain failure (finding R001-F001: Critical, dev-fault)'
+        - '### Increment 7: Add Keychain write failure unit test (finding R001-F002: Major, dev-fault)' -> '### Increment 8: Add Keychain write failure unit test (finding R001-F002: Major, dev-fault)'
+        - '### Increment 8: Refactor Task.sleep syntax (finding R001-F003: Minor, dev-fault)' -> '### Increment 9: Refactor Task.sleep syntax (finding R001-F003: Minor, dev-fault)'
+      Update frontmatter `todos` so its order matches the new heading sequence.
+  - id: "val-align-frontmatter-todos"
+    content: "Align frontmatter todos order with renamed Increment headings (execution order is the frontmatter sequence per /implement v1.2.2+)."
+    status: completed
+    kind: validation
+    artifact: increments.plan.md
+    dimension: Planning
+    proposed_resolution: "Align frontmatter todos order with renamed Increment headings."
 ---
 
 ## Problem Framing
