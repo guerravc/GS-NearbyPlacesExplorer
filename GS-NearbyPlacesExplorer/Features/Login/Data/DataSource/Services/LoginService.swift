@@ -87,4 +87,10 @@ public final class LoginService: LoginRemoteDataSource {
             }
         }
     }
+    
+    /// Signs the user out of Google.
+    @MainActor
+    public func signOut() async {
+        GIDSignIn.sharedInstance.signOut()
+    }
 }
