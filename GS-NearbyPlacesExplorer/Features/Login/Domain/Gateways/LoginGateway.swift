@@ -10,29 +10,19 @@ import Foundation
 /// Abstraction for data access of the Login module.
 ///
 /// This gateway defines the contract used by the domain layer (use cases)
-/// to interact with data sources (remote and/or local).
-/// Concrete implementations live in the Data layer and should not leak
-/// infrastructure details (networking, persistence, etc.) into the domain.
+/// to interact with data sources (remote and/or local) for authentication.
 public protocol LoginGateway: Sendable {
-  /// Fetches the main entity for the given request.
-  ///
-  /// - Parameter request: Request model containing the parameters required
-  ///   to retrieve the entity.
-  /// - Returns: A result containing the response model on success or an error
-  ///   describing the failure.
-  func fetch(
-    _ request: LoginRequest
-  ) async -> Result<LoginResponse, Error>
   
-  /// Performs an update or command operation for the given entity.
+  /// Authenticates the user.
   ///
-  /// This method is intended for write operations (create, update, delete)
-  /// related to the module entity.
+  /// - Parameter presenting: The presenting view controller (e.g. for Google Sign In).
+  /// - Returns: A result containing the authenticated `LoginEntity` or an error.
+  func signIn(
+    presenting: Any
+  ) async -> Result<LoginEntity, Error>
+  
+  /// Attempts to restore a previous session.
   ///
-  /// - Parameter entity: The entity to be persisted or used as input
-  ///   for the command operation.
-  /// - Returns: A result indicating success or failure of the operation.
-  func persist(
-    _ entity: LoginEntity
-  ) async -> Result<Void, Error>
+  /// - Returns: A result containing the authenticated `LoginEntity` or an error.
+  func restoreSignIn() async -> Result<LoginEntity, Error>
 }
