@@ -87,6 +87,25 @@ final class LoginViewModelTests: XCTestCase {
         XCTAssertEqual(router.root, .login)
     }
     
+    func test_signIn_keychainWriteFailure_showsErrorMessage() async {
+        let keychainError = NSError(domain: "Keychain", code: -50, userInfo: nil)
+        let signInUC = MockSignInUC(resultToReturn: .failure(keychainError))
+        let restoreUC = MockRestoreSignInUC(resultToReturn: .failure(AuthError.unknown))
+        let router = AppRouter()
+        
+        let sut = LoginViewModel(router: router)
+        sut.signInUC = signInUC
+        sut.restoreSignInUC = restoreUC
+        
+        await sut.signIn(presentingViewController: UIViewController())
+        
+        XCTAssertFalse(sut.isLoading)
+        XCTAssertTrue(sut.showError)
+        XCTAssertEqual(sut.errorMessage, "Ocurrió un error desconocido.")
+        XCTAssertFalse(sut.isAuthenticated)
+        XCTAssertEqual(router.root, .login)
+    }
+    
     func test_checkExistingSession_success_routesToMain() async {
         let profile = LoginEntity(id: "1", name: "Test", email: "test@test.com", profileImageURL: nil)
         let signInUC = MockSignInUC(resultToReturn: .failure(AuthError.unknown))
