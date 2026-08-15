@@ -10,63 +10,43 @@ import Foundation
 // MARK: - Remote (Gateway -> RemoteDataSource)
 
 /// Remote data source for the Login module.
-///
-/// This protocol defines operations that interact with backend services
-/// (HTTP APIs, streaming endpoints, etc.). Concrete implementations should
-/// live in the `Services` folder and use the Networking Core (`APIClient`,
-/// `APIRequestDispatcher`, etc.) to perform network calls.
-///
-/// The method signatures included here are examples and should be customized
-/// depending on the requirements of the module.
 public protocol LoginRemoteDataSource: Sendable {
 
-  /// Fetches data from the remote backend using the given request.
+  /// Authenticates the user remotely.
   ///
-  /// - Parameter request: The request model with parameters required by the backend.
-  /// - Returns: A `BaseResponse` wrapping the module-specific response DTO.
-  /// - Throws: A `NetworkError` or decoding error.
-  func fetch(
-    _ request: LoginRequest
-  ) async throws -> BaseResponse<LoginResponseDTO>
+  /// - Parameter presenting: The presenting view controller.
+  /// - Returns: A DTO representing the user.
+  /// - Throws: An error if authentication fails.
+  func signIn(
+    presenting: Any
+  ) async throws -> LoginModel
 
-  /// Persists the given entity DTO on the remote backend (create, update, delete, etc.).
+  /// Restores a previously authenticated session remotely.
   ///
-  /// - Parameter dto: The entity DTO to be sent to the backend.
-  /// - Returns: An `EmptyBaseResponse` describing backend status and message.
-  /// - Throws: A `NetworkError` or decoding error.
-  func persist(
-    _ dto: LoginEntityDTO
-  ) async throws -> EmptyBaseResponse
+  /// - Returns: A DTO representing the user.
+  /// - Throws: An error if restoration fails.
+  func restoreSignIn() async throws -> LoginModel
 }
 
 // MARK: - Local (Gateway -> LocalDataSource)
 
 /// Local data source for the Login module.
-///
-/// This protocol defines operations that interact with local storage mechanisms:
-/// databases, caches, files, or UserDefaults. Concrete implementations should
-/// live in the `PersistentStorages` folder.
-///
-/// The method signatures below are examples and should be modified according
-/// to the persistence needs of each feature.
 public protocol LoginLocalDataSource: Sendable {
 
-  /// Loads a cached entity from local storage, if available.
+  /// Saves the given token to local storage.
   ///
-  /// - Returns: A cached instance of the module entity, or `nil` if none exists.
-  /// - Throws: An error if the read operation fails.
-  func loadCachedEntity() async throws -> LoginEntity?
-
-  /// Saves the given entity to local storage.
-  ///
-  /// - Parameter entity: The entity to persist locally.
+  /// - Parameter token: The authentication token to persist.
   /// - Throws: An error if the write operation fails.
-  func save(
-    _ entity: LoginEntity
-  ) async throws
+  func saveToken(_ token: String) throws
 
-  /// Clears any cached data associated with the module.
+  /// Loads the cached token from local storage, if available.
+  ///
+  /// - Returns: The cached token, or `nil` if none exists.
+  /// - Throws: An error if the read operation fails.
+  func getToken() throws -> String?
+
+  /// Clears any cached token.
   ///
   /// - Throws: An error if the clear operation fails.
-  func clearCache() async throws
+  func deleteToken() throws
 }
