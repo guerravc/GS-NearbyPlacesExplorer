@@ -3,7 +3,7 @@ classification: standard
 task_id: feature-login-google
 task_origin: local
 started: 2026-08-14T18:09:10Z
-status: in_progress
+status: in_review
 tracker_status: null
 completed_steps:
   - intake
@@ -11,10 +11,11 @@ completed_steps:
   - blueprint
   - validate
   - commit
-current_step: pr
+  - pr
+current_step: closure
 refinement_validated: false
 last_refreshed_at: null
-rhoaias_update: deferred
+rhoaias_update: skipped
 published: null
 completed: null
 artifacts:
@@ -178,7 +179,33 @@ command_log:
   - command: /adjudicate-review
     started_at: 2026-08-14T23:00:16Z
     ended_at: 2026-08-14T23:01:20Z
+  - command: /self-review
+    started_at: 2026-08-15T09:48:00Z
+    ended_at: 2026-08-15T09:48:40Z
+    dispatches:
+      - subagent: aias-correctness-reviewer
+        started_at: 2026-08-15T09:48:05Z
+        ended_at: 2026-08-15T09:48:10Z
+      - subagent: aias-quality-reviewer
+        started_at: 2026-08-15T09:48:05Z
+        ended_at: 2026-08-15T09:48:10Z
+      - subagent: aias-architecture-reviewer
+        started_at: 2026-08-15T09:48:05Z
+        ended_at: 2026-08-15T09:48:10Z
+      - subagent: aias-test-auditor
+        started_at: 2026-08-15T09:48:05Z
+        ended_at: 2026-08-15T09:48:10Z
+      - subagent: aias-security-auditor
+        started_at: 2026-08-15T09:48:05Z
+        ended_at: 2026-08-15T09:48:10Z
+      - subagent: aias-reflector
+        started_at: 2026-08-15T09:48:10Z
+        ended_at: 2026-08-15T09:48:40Z
   - command: /commit
     started_at: 2026-08-15T09:41:32Z
     ended_at: 2026-08-15T09:44:19Z
+    outcome: completed
+  - command: /pr
+    started_at: 2026-08-15T09:52:13Z
+    ended_at: 2026-08-15T09:55:17Z
     outcome: completed
