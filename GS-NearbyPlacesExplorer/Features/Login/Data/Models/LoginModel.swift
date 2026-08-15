@@ -1,5 +1,5 @@
 // 
-//  LoginDTO.swift
+//  LoginModel.swift
 //  GS-NearbyPlacesExplorer
 //
 //  Created by Carlos Lopez on 14/08/26.
