@@ -26,6 +26,9 @@ public protocol LoginRemoteDataSource: Sendable {
   /// - Returns: A DTO representing the user.
   /// - Throws: An error if restoration fails.
   func restoreSignIn() async throws -> LoginModel
+
+  /// Signs the user out remotely.
+  func signOut() async
 }
 
 // MARK: - Local (Gateway -> LocalDataSource)
