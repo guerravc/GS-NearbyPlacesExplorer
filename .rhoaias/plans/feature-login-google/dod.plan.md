@@ -1,0 +1,12 @@
+- [ ] La UI de login implementada en SwiftUI coincide con la referencia (textos, icono, botón Google).
+- [ ] La integración con el SDK de Google SignIn está operativa vía SPM.
+- [ ] La lógica MVVM (View, ViewModel, UseCase, Repository) está estructurada siguiendo Clean Architecture.
+- [ ] En éxito: se extrae el nombre y la foto, se muestra durante 2 segundos, y se navega usando cross-fade.
+- [ ] En fallo de red: se muestra la alerta nativa "Error de red. Inténtalo de nuevo."
+- [ ] En cancelación: se regresa silenciosamente a la vista base.
+- [ ] La sesión se guarda permanentemente de forma segura usando Keychain.
+- [ ] Pruebas unitarias completadas para el AuthUseCase y LoginViewModel y pasan exitosamente.
+- [ ] El código compila sin errores y cumple con las convenciones Swift 6 de `gs-nearbyplacesexplorer`.
+- [ ] Unit test verifies the restorePreviousSignIn success path for Auto-Login.
+- [ ] Manual test step verifies the app redirects back successfully after Safari auth (URL Scheme validation).
+- [ ] Unit test simulates a Keychain write failure and asserts that the ViewModel correctly transitions to an error state without persisting a corrupt session.
