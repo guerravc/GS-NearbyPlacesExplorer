@@ -26,8 +26,13 @@ public final class DefaultLoginRepository: LoginGateway {
     do {
       let dto = try await remoteDataSource.signIn(presenting: presenting)
       // Save token (using ID as a mock token since GoogleSignIn handles its own token)
-      try localDataSource.saveToken(dto.id)
-      return .success(dto.toDomain())
+      do {
+        try localDataSource.saveToken(dto.id)
+        return .success(dto.toDomain())
+      } catch {
+        await remoteDataSource.signOut()
+        return .failure(error)
+      }
     } catch {
       return .failure(error)
     }
