@@ -5,101 +5,100 @@
 //  Created by Carlos Lopez on 14/08/26.
 //
 
-import Observation
 import Foundation
+import SwiftUI
+import Observation
 
-/// Contract for the Login view model.
-///
-/// This protocol defines all presentation requirements the View relies on.
-/// It allows mocking or replacing the view model in tests or previews.
-@MainActor
-protocol LoginViewModelProtocol: AnyObject {
-    var title: String { get }
-    var state: LoginViewModel.ViewState { get }
-
-    func onAppear() async
-    func reload() async
-}
-
-/// Default `@Observable` implementation of the module's view model.
-///
-/// This type manages loading state, errors, and data presentation
-/// for the `LoginView`.
-///
-/// Replace the stubbed async calls with real logic depending on
-/// your project's architecture (Clean, Networking, Services, etc.).
-///
-/// - ADR-004: `@MainActor` is applied for Swift 6 strict concurrency readiness.
-///   While `@Observable` handles SwiftUI observation correctly without it in
-///   Swift 5.9, strict concurrency checking requires explicit main-actor isolation
-///   for types that mutate state observed by the UI.
-@MainActor
+/// View model responsible for managing the state and actions of the Login screen.
 @Observable
-final class LoginViewModel: LoginViewModelProtocol {
-
-    // MARK: - ViewState
-
-    /// Represents the possible presentation states of the view.
-    enum ViewState {
-        /// Initial state before any data has been requested.
-        case idle
-        /// Data is being fetched.
-        case loading
-        /// Data was loaded successfully.
-        case loaded([LoginModel])
-        /// An error occurred while fetching data.
-        case error(String)
+@MainActor
+final class LoginViewModel {
+    /// Indicates if a login operation is currently in progress.
+    var isLoading: Bool = false
+    /// Indicates if an error alert should be presented.
+    var showError: Bool = false
+    /// The error message to display when `showError` is true.
+    var errorMessage: String? = nil
+    
+    /// Indicates whether the user is currently authenticated.
+    var isAuthenticated: Bool = false
+    /// The authenticated user's profile information.
+    var userProfile: LoginEntity? = nil
+    
+    @ObservationIgnored @Inject var signInUC: any SignInUC
+    @ObservationIgnored @Inject var restoreSignInUC: any RestoreSignInUC
+    
+    /// The router used to navigate between screens.
+    private var router: AppRouter
+    
+    /// Initializes a new instance of `LoginViewModel`.
+    /// - Parameter router: The application router.
+    init(
+        router: AppRouter
+    ) {
+        self.router = router
     }
-
-    // MARK: - Presentation State
-
-    /// Title displayed in the navigation bar.
-    var title: String = "Login"
-
-    /// Current presentation state of the view.
-    var state: ViewState = .idle
-
-    // MARK: - Init
-
-    init() { }
-
-    // MARK: - Public Methods
-
-    /// Called when the view appears for the first time.
-    func onAppear() async {
-        await loadData()
+    
+    /// Initiates the sign-in process.
+    /// - Parameter presentingViewController: The view controller to present the authentication UI.
+    func signIn(presentingViewController: UIViewController) async {
+        isLoading = true
+        showError = false
+        
+        let result = await signInUC.execute(presentingViewController)
+        
+        switch result {
+        case .success(let profile):
+            userProfile = profile
+            isAuthenticated = true
+            
+            // Add a small delay for UX so the user can see the spinner and transition smoothly
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            
+            withAnimation {
+                router.root = .main
+            }
+        case .failure(let error):
+            handleAuthError(error)
+        }
+        
+        isLoading = false
     }
-
-    /// Reloads the data on user demand (pull-to-refresh or retry).
-    func reload() async {
-        await loadData()
+    
+    /// Checks for an existing session and restores it if available.
+    func checkExistingSession() async {
+        let result = await restoreSignInUC.execute()
+        switch result {
+        case .success(let profile):
+            userProfile = profile
+            isAuthenticated = true
+            withAnimation {
+                router.root = .main
+            }
+        case .failure:
+            // Ignore error for silent login, user just needs to log in normally
+            isAuthenticated = false
+        }
     }
-
-    // MARK: - Private Helpers
-
-    /// Simulates an async load operation.
-    ///
-    /// Replace this placeholder with your actual logic:
-    /// - calling a service
-    /// - interacting with a use case
-    /// - using the networking core
-    private func loadData() async {
-        state = .loading
-
-        do {
-            try await Task.sleep(for: .seconds(1)) // Simulated delay
-
-            let items: [LoginModel] = [
-                .init(id: UUID(), title: "Item 1", subtitle: "Example A"),
-                .init(id: UUID(), title: "Item 2", subtitle: "Example B"),
-                .init(id: UUID(), title: "Item 3", subtitle: nil)
-            ]
-
-            state = .loaded(items)
-        } catch is CancellationError {
-            return
-        } catch {
-            state = .error("Unable to load data.")
+    
+    /// Handles authentication errors and updates the view model state.
+    /// - Parameter error: The error that occurred during authentication.
+    private func handleAuthError(_ error: Error) {
+        if let authError = error as? AuthError {
+            switch authError {
+            case .userCancelled:
+                // Do not show error alert when user intentionally cancels
+                break
+            case .networkError:
+                errorMessage = "Error de red. Inténtalo de nuevo."
+                showError = true
+            case .unknown:
+                errorMessage = "Ocurrió un error desconocido."
+                showError = true
+            }
+        } else {
+            errorMessage = "Ocurrió un error desconocido."
+            showError = true
         }
     }
 }
