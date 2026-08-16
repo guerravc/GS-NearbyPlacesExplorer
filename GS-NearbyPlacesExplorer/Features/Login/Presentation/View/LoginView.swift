@@ -135,8 +135,15 @@ struct MockRestoreSignInUC: RestoreSignInUC {
     }
 }
 
+struct MockHasStoredSessionUC: HasStoredSessionUC {
+    func execute() async -> Result<Bool, Error> {
+        .success(false)
+    }
+}
+
 #Preview("Login - Default") {
     DependencyContainer.registerSingleton((any SignInUC).self, MockSignInUC())
+    DependencyContainer.registerSingleton((any HasStoredSessionUC).self, MockHasStoredSessionUC())
     DependencyContainer.registerSingleton((any RestoreSignInUC).self, MockRestoreSignInUC())
     let vm = LoginViewModel(router: AppRouter())
     return LoginView(viewModel: vm)
@@ -144,6 +151,7 @@ struct MockRestoreSignInUC: RestoreSignInUC {
 
 #Preview("Login - Loading") {
     DependencyContainer.registerSingleton((any SignInUC).self, MockSignInUC())
+    DependencyContainer.registerSingleton((any HasStoredSessionUC).self, MockHasStoredSessionUC())
     DependencyContainer.registerSingleton((any RestoreSignInUC).self, MockRestoreSignInUC())
     let vm = LoginViewModel(router: AppRouter())
     vm.isLoading = true
@@ -152,6 +160,7 @@ struct MockRestoreSignInUC: RestoreSignInUC {
 
 #Preview("Login - Error") {
     DependencyContainer.registerSingleton((any SignInUC).self, MockSignInUC())
+    DependencyContainer.registerSingleton((any HasStoredSessionUC).self, MockHasStoredSessionUC())
     DependencyContainer.registerSingleton((any RestoreSignInUC).self, MockRestoreSignInUC())
     let vm = LoginViewModel(router: AppRouter())
     vm.errorMessage = "Error de red. Inténtalo de nuevo."
