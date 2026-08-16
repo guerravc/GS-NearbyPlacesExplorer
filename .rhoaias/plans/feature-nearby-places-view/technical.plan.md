@@ -41,9 +41,13 @@ Currently, the "Vista 2" (Nearby Places View) exists only as boilerplate files. 
 - **Pattern:** Clean Architecture (Data, Domain, Presentation layers) with MVVM and SwiftUI Observation.
 - **Async model:** Swift 5.7+ `async/await` for MapKit searches and location fetching.
 - **Location Management:** A dedicated `@Observable` `LocationManager` wrapping `CLLocationManager` in the AppCore module.
-- **Data Layer:** `DefaultNearbyPlacesService` encapsulates the `MKLocalSearch` logic and returns `NearbyPlacesDTO`. `DefaultNearbyPlacesRepository` maps DTOs to Domain `NearbyPlacesEntity`.
+- **Data Layer:** `DefaultNearbyPlacesService` encapsulates `MKLocalSearch` using modern iOS 26 `MKMapItem.location` and returns `NearbyPlacesDTO`. `DefaultNearbyPlacesRepository` maps DTOs to Domain `NearbyPlacesEntity`.
 - **Domain Layer:** `FetchNearbyPlacesUC` is the Use Case invoked by the ViewModel to retrieve entities via the `NearbyPlacesGateway` interface.
+- **Authentication Initialization:** `HasStoredSessionUC` orchestrates silent background session validation during app launch to prevent UI flickering on the Login screen.
 - **Presentation Layer:** `NearbyPlacesViewModel` holds the search state (`query`, `results`, `isLoading`), mapping `NearbyPlacesEntity` to `NearbyPlacesModel`. The view layer remains completely decoupled from `MKMapItem`.
+- **Navigation & Search Architecture (iOS 18+):** A native `TabView` structure with dedicated tabs. The Search Tab (`role: .search`) preserves the previous content context (`lastContentTab`) and utilizes `.searchable(isPresented:)` natively instead of global `NavigationStack` wrappers or `@FocusState` hacks.
+- **State Consistency (Map):** The map utilizes `MapCameraPosition` to prevent "zoom out" resets when the view hierarchy shifts. State is shared seamlessly between the Map Tab and Search Tab overlays.
+- **State Consistency (List):** Scroll position synchronization across instances relies on local view anchors tracking visible indices, avoiding infinite loops caused by inactive views overwriting global state.
 - **INV-001 — Blocking UX:** A translucid overlay with `ProgressView` MUST intercept user interactions while the Use Case is in flight.
 - **INV-002 — State Consistency:** Tab selection changes MUST NOT refetch data or clear the current search results in the ViewModel.
 - **BND-001 — Mapper Decoupling:** `MKPointOfInterestCategory` mapping MUST be handled by a dedicated non-UI utility (`POICategoryMapper`). UI Views MUST NOT contain explicit category to symbol mapping.
