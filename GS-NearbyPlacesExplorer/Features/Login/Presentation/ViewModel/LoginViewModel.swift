@@ -26,6 +26,7 @@ final class LoginViewModel {
     var userProfile: LoginEntity? = nil
     
     @ObservationIgnored @Inject var signInUC: any SignInUC
+    @ObservationIgnored @Inject var hasStoredSessionUC: any HasStoredSessionUC
     @ObservationIgnored @Inject var restoreSignInUC: any RestoreSignInUC
     
     /// The router used to navigate between screens.
@@ -67,17 +68,23 @@ final class LoginViewModel {
     
     /// Checks for an existing session and restores it if available.
     func checkExistingSession() async {
+        guard case .success(true) = await hasStoredSessionUC.execute() else {
+            return
+        }
+
+        isLoading = true
         let result = await restoreSignInUC.execute()
+        isLoading = false
+
         switch result {
         case .success(let profile):
             userProfile = profile
-            isAuthenticated = true
             withAnimation {
                 router.root = .main
             }
         case .failure:
-            // Ignore error for silent login, user just needs to log in normally
-            isAuthenticated = false
+            // Keep the login screen idle when the stored session cannot be restored.
+            break
         }
     }
     
