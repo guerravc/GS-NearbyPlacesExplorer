@@ -13,6 +13,11 @@ import XCTest
 struct MockLoginGateway: LoginGateway {
     var signInResultToReturn: Result<LoginEntity, Error>
     var restoreSignInResultToReturn: Result<LoginEntity, Error>
+    var hasStoredSessionToReturn = false
+
+    func hasStoredSession() -> Bool {
+        hasStoredSessionToReturn
+    }
     
     func signIn(presenting: Any) async -> Result<LoginEntity, Error> {
         return signInResultToReturn
@@ -91,5 +96,19 @@ final class SignInUCTests: XCTestCase {
         case .failure(let error):
             XCTAssertEqual(error as? AuthError, AuthError.networkError)
         }
+    }
+
+    func test_HasStoredSessionUC_returnsGatewayValue() async {
+        let gateway = MockLoginGateway(
+            signInResultToReturn: .failure(AuthError.unknown),
+            restoreSignInResultToReturn: .failure(AuthError.unknown),
+            hasStoredSessionToReturn: true
+        )
+        let sut = HasStoredSessionUCImpl()
+        sut.gateway = gateway
+
+        let result = await sut.execute()
+
+        XCTAssertEqual(try? result.get(), true)
     }
 }
