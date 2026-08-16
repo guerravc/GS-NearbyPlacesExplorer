@@ -1,132 +1,360 @@
-// 
-//  NearbyPlacesView.swift
-//  GS-NearbyPlacesExplorer
-//
-//  Created by Carlos Lopez on 14/08/26.
-//
-
+import CoreLocation
+import MapKit
 import SwiftUI
 
 /// Root SwiftUI view for the NearbyPlaces module.
-///
-/// This view owns the lifecycle of the view model using a `@State` property.
-/// It renders different states (loading, error, empty, content) based on the
-/// view model's `ViewState`.
-struct NearbyPlacesView: View {
+public struct NearbyPlacesView: View {
 
-    // MARK: - State
+  @Environment(AppRouter.self) private var router
+  @State private var viewModel: NearbyPlacesViewModel
+  @State private var locationManager = LocationManager()
 
-    /// View model driving the presentation logic for this module.
-    ///
-    /// The view owns the view model instance by storing it in `@State`.
-    /// You can inject a custom instance for previews or testing.
-    @State private var viewModel: NearbyPlacesViewModel
+  @State private var selectedTab: Tabs = .map
+  @State private var lastContentTab: Tabs = .map
+  @State private var isSearchPresented = false
+  @State private var presentationState = NearbyPlacesPresentationState()
+  @State private var navigationPath: [NearbyPlacesEntity] = []
 
-    // MARK: - Initializers
+  enum Tabs: Hashable {
+    case map
+    case list
+    case search
+  }
 
-    /// Creates a new instance of the view.
-    ///
-    /// - Parameter viewModel: Optional custom view model instance,
-    ///   useful for previews or dependency injection in tests.
-    init(viewModel: NearbyPlacesViewModel) {
-        self._viewModel = State(initialValue: viewModel)
+  public init(viewModel: NearbyPlacesViewModel) {
+    self._viewModel = State(initialValue: viewModel)
+  }
+
+  public var body: some View {
+    TabView(selection: $selectedTab) {
+      Tab("Mapa", systemImage: "map.fill", value: .map) {
+        tabContent(for: .map, title: "Mapa")
+      }
+
+      Tab("Lista", systemImage: "list.bullet", value: .list) {
+        tabContent(for: .list, title: viewModel.title)
+      }
+
+      Tab(value: .search, role: .search) {
+        searchTabContent
+      }
     }
+    .tabViewStyle(.sidebarAdaptable)
+    .onChange(of: selectedTab) { _, tab in
+      switch tab {
+      case .map, .list:
+        lastContentTab = tab
+        isSearchPresented = false
+      case .search:
+        isSearchPresented = true
+      }
+    }
+    .onChange(of: locationManager.location) { oldLocation, newLocation in
+      if let newLocation {
+        if let oldSpan = presentationState.mapPosition.region?.span {
+          presentationState.mapPosition = .region(
+            MKCoordinateRegion(
+              center: newLocation.coordinate,
+              span: oldSpan
+            ))
+        } else {
+          presentationState.mapPosition = .region(
+            MKCoordinateRegion(
+              center: newLocation.coordinate,
+              span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            ))
+        }
+        if oldLocation == nil {
+          performSearch()
+        }
+      }
+    }
+    .onAppear {
+      if locationManager.isAuthorized {
+        locationManager.requestLocation()
+      } else {
+        locationManager.requestAuthorization()
+      }
+    }
+  }
 
-    // MARK: - View
+  private func tabContent(for tab: Tabs, title: String) -> some View {
+    NavigationStack(path: $navigationPath) {
+      contentFor(
+        isMap: tab == .search ? lastContentTab == .map : tab == .map,
+        activeTab: tab
+      )
+        .navigationTitle(title)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar { logoutToolbar }
+    }
+  }
 
-    /// Main view hierarchy for the module.
-    var body: some View {
-        NavigationStack {
-            Group {
-                switch viewModel.state {
-                case .idle, .loading:
-                    loadingView
-                case .loaded(let items) where items.isEmpty:
-                    emptyView
-                case .loaded(let items):
-                    contentView(items: items)
-                case .error(let message):
-                    errorView(message: message)
-                }
+  private var searchTabContent: some View {
+    tabContent(for: .search, title: "Buscar")
+      .searchable(
+        text: $viewModel.query,
+        isPresented: $isSearchPresented,
+        placement: .navigationBarDrawer(displayMode: .always),
+        prompt: "Buscar lugares"
+      )
+      .searchPresentationToolbarBehavior(.avoidHidingContent)
+      .onSubmit(of: .search) {
+        performSearch()
+      }
+      .onChange(of: viewModel.query) { previousQuery, query in
+        guard !previousQuery.isEmpty, query.isEmpty else { return }
+        performSearch()
+      }
+      .onAppear {
+        isSearchPresented = true
+      }
+  }
+
+  @ToolbarContentBuilder
+  private var logoutToolbar: some ToolbarContent {
+    ToolbarItem(placement: .topBarTrailing) {
+      Button(action: {
+        router.performLogout?()
+      }) {
+        Image(systemName: "rectangle.portrait.and.arrow.right")
+      }
+      .tint(.red)
+    }
+  }
+
+  @ViewBuilder
+  private func contentFor(isMap: Bool, activeTab: Tabs) -> some View {
+    ZStack {
+      if locationManager.isDenied {
+        locationDeniedView
+      } else {
+        Group {
+          switch viewModel.state {
+          case .idle, .loading:
+            if isMap {
+              mapView(items: [], activeTab: activeTab)
+            } else {
+              Color.clear
             }
-            .navigationTitle(viewModel.title)
-        }
-        .task {
-            await viewModel.onAppear()
-        }
-    }
-
-    // MARK: - Subviews
-
-    /// View displayed while the data is being loaded.
-    private var loadingView: some View {
-        VStack(spacing: 16) {
-            ProgressView()
-            Text("Loading...")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    /// View displayed when an error occurs.
-    ///
-    /// - Parameter message: Error description to show to the user.
-    private func errorView(message: String) -> some View {
-        VStack(spacing: 12) {
-            Text(message)
-                .font(.body)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 24)
-
-            Button(action: {
-                Task {
-                    await viewModel.reload()
-                }
-            }) {
-                Text("Retry")
-                    .font(.body.weight(.semibold))
+          case .loaded(let items):
+            if isMap {
+              mapView(items: items, activeTab: activeTab)
+            } else {
+              listView(items: items)
             }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .foregroundStyle(.primary)
-    }
-
-    /// View displayed when there is no data to show.
-    private var emptyView: some View {
-        VStack(spacing: 8) {
-            Text("No data available")
-                .font(.body)
-            Text("Try again later or pull to refresh.")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-
-    /// Main content view when there is data available.
-    private func contentView(items: [NearbyPlacesModel]) -> some View {
-        List(items) { item in
-            VStack(alignment: .leading, spacing: 4) {
-                Text(item.title)
-                    .font(.headline)
-                if let subtitle = item.subtitle, !subtitle.isEmpty {
-                    Text(subtitle)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
+          case .empty(let message):
+            if isMap {
+              mapView(items: [], activeTab: activeTab).overlay(emptyView(message: message))
+            } else {
+              emptyView(message: message)
             }
-            .padding(.vertical, 4)
+          case .error(let message):
+            errorView(message: message)
+          }
         }
-        .listStyle(.plain)
-        .refreshable {
-            await viewModel.reload()
-        }
+      }
+
+      if case .loading = viewModel.state {
+        loadingOverlay.allowsHitTesting(false)
+      }
     }
+    .ignoresSafeArea(edges: .bottom)
+    .navigationDestination(for: NearbyPlacesEntity.self) { place in
+      Text("Detalles de \(place.name)")
+        .navigationTitle(place.name)
+        .toolbar(.hidden, for: .tabBar)
+    }
+  }
+
+  private func mapView(items: [NearbyPlacesEntity], activeTab: Tabs) -> some View {
+    @Bindable var presentationState = presentationState
+
+    return NearbyPlacesMapView(
+      places: items,
+      position: $presentationState.mapPosition,
+      selectedPlace: $presentationState.selectedPlace,
+      showsUserLocation: presentationState.showsUserLocation,
+      onPlaceSelected: { place in
+        guard selectedTab == activeTab else { return }
+        navigationPath.append(place)
+        presentationState.selectedPlace = nil
+      }
+    ) {
+      presentationState.showsUserLocation = true
+
+      guard let location = locationManager.location else { return }
+
+      withAnimation {
+        presentationState.mapPosition = .region(
+          MKCoordinateRegion(
+            center: location.coordinate,
+            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+          ))
+      }
+    }
+  }
+
+  private func listView(items: [NearbyPlacesEntity]) -> some View {
+    @Bindable var presentationState = presentationState
+
+    return NearbyPlacesListView(
+      places: itemsSortedByDistance(items),
+      currentLocation: locationManager.location,
+      selectedPlace: $presentationState.selectedPlace,
+      initialScrollAnchorID: presentationState.listScrollAnchorID
+    ) { scrollAnchorID in
+      presentationState.listScrollAnchorID = scrollAnchorID
+    }
+  }
+
+  private func itemsSortedByDistance(_ items: [NearbyPlacesEntity]) -> [NearbyPlacesEntity] {
+    guard let currentLocation = locationManager.location else { return items }
+
+    return items.enumerated()
+      .sorted { left, right in
+        let leftDistance = currentLocation.distance(
+          from: CLLocation(
+            latitude: left.element.coordinate.latitude,
+            longitude: left.element.coordinate.longitude
+          )
+        )
+        let rightDistance = currentLocation.distance(
+          from: CLLocation(
+            latitude: right.element.coordinate.latitude,
+            longitude: right.element.coordinate.longitude
+          )
+        )
+        return leftDistance == rightDistance ? left.offset < right.offset : leftDistance < rightDistance
+      }
+      .map(\.element)
+  }
+
+  private var loadingOverlay: some View {
+    ZStack {
+      Color.black.opacity(0.2)
+        .ignoresSafeArea()
+      ProgressView("Buscando...")
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(8)
+        .shadow(radius: 4)
+    }
+  }
+
+  private var locationDeniedView: some View {
+    VStack(spacing: 16) {
+      Image(systemName: "location.slash.fill")
+        .font(.system(size: 50))
+        .foregroundColor(.red)
+      Text("Ubicación Denegada")
+        .font(.title2).bold()
+      Text(
+        "Esta funcionalidad requiere acceso a tu ubicación. Por favor, habilítala en Configuración."
+      )
+      .multilineTextAlignment(.center)
+      .padding(.horizontal)
+      Button("Abrir Configuración") {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+          UIApplication.shared.open(url)
+        }
+      }
+      .buttonStyle(.borderedProminent)
+    }
+  }
+
+  private func errorView(message: String) -> some View {
+    VStack(spacing: 12) {
+      Text(message)
+        .font(.body)
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, 24)
+
+      Button(action: {
+        performSearch()
+      }) {
+        Text("Reintentar")
+          .font(.body.weight(.semibold))
+      }
+      .buttonStyle(.bordered)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
+
+  private func emptyView(message: String) -> some View {
+    VStack(spacing: 8) {
+      Text(message)
+        .font(.body)
+        .multilineTextAlignment(.center)
+        .padding(.horizontal)
+      Text("Intenta de nuevo.")
+        .font(.footnote)
+        .foregroundStyle(.secondary)
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color(.systemBackground).opacity(0.8))
+  }
+
+  private func performSearch() {
+    let lat = locationManager.location?.coordinate.latitude ?? 19.4326
+    let lng = locationManager.location?.coordinate.longitude ?? -99.1332
+
+    Task {
+      await viewModel.search(
+        latitude: lat, longitude: lng, query: viewModel.query.isEmpty ? nil : viewModel.query)
+    }
+  }
 }
 
-// MARK: - Preview
+#Preview("Idle") {
+  let mockUC = MockFetchNearbyPlacesUC()
+  let vm = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
+  NearbyPlacesView(viewModel: vm)
+    .environment(AppRouter())
+}
 
-#Preview {
-    NearbyPlacesView(viewModel: NearbyPlacesViewModel())
+#Preview("Loading") {
+  let mockUC = MockFetchNearbyPlacesUC()
+  let vm = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
+  vm.state = .loading
+  return NearbyPlacesView(viewModel: vm)
+    .environment(AppRouter())
+}
+
+#Preview("Loaded Map") {
+  let mockUC = MockFetchNearbyPlacesUC()
+  let vm = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
+  vm.state = .loaded([
+    NearbyPlacesEntity(
+      id: "1", name: "El Buen Café", coordinate: (19.43, -99.13), category: "MKPOICategoryCafe",
+      address: "Calle 1"),
+    NearbyPlacesEntity(
+      id: "2", name: "Parque Central", coordinate: (19.44, -99.14), category: "MKPOICategoryPark",
+      address: "Avenida 2"),
+  ])
+  return NearbyPlacesView(viewModel: vm)
+    .environment(AppRouter())
+}
+
+#Preview("Empty State") {
+  let mockUC = MockFetchNearbyPlacesUC()
+  let vm = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
+  vm.state = .empty("No encontramos resultados para 'Tu búsqueda'. Intenta con otra búsqueda.")
+  return NearbyPlacesView(viewModel: vm)
+    .environment(AppRouter())
+}
+
+#Preview("Error State") {
+  let mockUC = MockFetchNearbyPlacesUC()
+  let vm = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
+  vm.state = .error(
+    "Hubo un problema al buscar lugares. Revisa tu conexión a internet e intenta de nuevo.")
+  return NearbyPlacesView(viewModel: vm)
+    .environment(AppRouter())
+}
+
+private class MockFetchNearbyPlacesUC: FetchNearbyPlacesUC {
+  func execute(_ input: FetchNearbyPlacesInput) async -> Result<[NearbyPlacesEntity], Error> {
+    return .success([])
+  }
 }
