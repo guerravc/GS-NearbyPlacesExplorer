@@ -1,4 +1,4 @@
-- [ ] La UI está orquestada por un contenedor superior (`NavigationStack`) que posee el `searchable` (Placeholder: "Buscar lugares cercanos") y aloja el `TabView`.
+- [ ] La UI está orquestada por un `TabView` como contenedor raíz, el cual envuelve un `NavigationStack` por cada pestaña. El placeholder del `searchable` es "Buscar lugares cercanos".
 - [ ] La aplicación solicita permisos de ubicación; ante denegación muestra el alert exacto "Ubicación necesaria" con instrucciones a Preferencias.
 - [ ] Existe un botón global de Logout (`rectangle.portrait.and.arrow.right`) anclado a la navegación superior derecha.
 - [ ] El envío de búsqueda (`onSubmit`) muestra un overlay con `ProgressView` que deshabilita la interacción general.
@@ -7,6 +7,6 @@
 - [ ] La celda de lista sigue estrictamente las specs visuales (fondo `Color.red.opacity(0.15)`, radius 8, icono `Color.red`, título `headline`, subtítulo `subheadline` gris, `chevron.right`).
 - [ ] El subtítulo muestra la métrica de distancia exacta y aplica los copies "Abierto", "Cerrado", o "Horario no disponible".
 - [ ] Empty States y Errores de Red muestran en pantalla los copies exactos definidos en los requerimientos de Producto.
-- [ ] Hacer tap en un marcador o celda acciona el enrutamiento (`NavigationLink`) hacia `AboutThePlaceView`.
+- [ ] Hacer tap en una celda de la lista acciona el enrutamiento (`NavigationLink`) hacia `AboutThePlaceView`. Los marcadores del mapa usan una estrategia diferente. En ambos flujos, el tabbar se oculta al hacer push.
 - [ ] El ViewModel dispone de pruebas unitarias validando estados y el Helper/Mapper de Iconos dispone de tests validando las conversiones.
 - [ ] El código compila sin errores ni advertencias bajo el standard de Swift 6.

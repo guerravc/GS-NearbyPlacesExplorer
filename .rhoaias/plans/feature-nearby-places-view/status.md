@@ -90,3 +90,26 @@ command_log:
 - command: /commit
   started_at: '2026-08-16T12:54:47Z'
   ended_at: '2026-08-16T13:36:54Z'
+- command: /self-review
+  started_at: 2026-08-16T14:00:30Z
+  ended_at: 2026-08-16T14:02:00Z
+  dispatches:
+    - subagent: aias-correctness-reviewer
+      started_at: 2026-08-16T14:01:00Z
+      ended_at: 2026-08-16T14:01:30Z
+    - subagent: aias-quality-reviewer
+      started_at: 2026-08-16T14:01:00Z
+      ended_at: 2026-08-16T14:01:30Z
+    - subagent: aias-architecture-reviewer
+      started_at: 2026-08-16T14:01:00Z
+      ended_at: 2026-08-16T14:01:30Z
+    - subagent: aias-test-auditor
+      started_at: 2026-08-16T14:01:00Z
+      ended_at: 2026-08-16T14:01:30Z
+    - subagent: aias-security-auditor
+      started_at: 2026-08-16T14:01:00Z
+      ended_at: 2026-08-16T14:01:30Z
+    - subagent: aias-reflector
+      started_at: 2026-08-16T14:01:30Z
+      ended_at: 2026-08-16T14:01:50Z
+

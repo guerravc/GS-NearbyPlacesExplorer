@@ -1,7 +1,7 @@
 ## Functional
 - **User Flow**: Petición de ubicación -> Búsqueda con retención de estado -> Identificación visual de lugares por categoría (Icono) -> Despliegue en Mapa o Lista alternable -> Navegación preparada a Vista 3 -> Logout.
 - **Acceptance Criteria**:
-  - `TabView` gestionando las vistas de Mapa y Lista con iconos definidos (`map` y `list.bullet`).
+  - `TabView` como contenedor raíz (con un `NavigationStack` por tab) gestionando las vistas de Mapa y Lista con iconos definidos (`map` y `list.bullet`). Al navegar a detalle, la barra de pestañas debe ocultarse.
   - Botón Logout con icono `rectangle.portrait.and.arrow.right`.
   - Mapeo programático de `MKPointOfInterestCategory` a SF Symbols (mínimo 15 categorías críticas + fallback `mappin.and.ellipse`).
   - Bloqueo de UI (Overlay) durante peticiones de red vía `MKLocalSearch`.

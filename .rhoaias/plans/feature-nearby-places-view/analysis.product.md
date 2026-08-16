@@ -22,15 +22,14 @@ Las vistas deben incluir un comportamiento resiliente con copies exactos: si App
 
 **Acceptance Criteria**
 - El flujo verifica permisos de CoreLocation. Si está denegado, muestra Alerta: Título "Ubicación necesaria", Mensaje "Necesitamos tu ubicación para calcular las distancias y mostrar lugares cercanos. Por favor, habilítala en las preferencias de tu dispositivo.", con botones "Cancelar" e "Ir a Preferencias".
-- La interfaz implementa un `TabView` ("Mapa" con icono `map`, "Lista" con `list.bullet`).
-- El estado de la búsqueda reside en un nivel superior (ej. `NavigationStack`) para que el cambio de tabs no reinicie los resultados.
+- La interfaz implementa un `TabView` como contenedor raíz ("Mapa" con icono `map`, "Lista" con `list.bullet`), el cual aloja un `NavigationStack` independiente por cada pestaña.
 - El placeholder del Searchable debe ser "Buscar lugares cercanos".
 - Existe un botón global de Logout (`rectangle.portrait.and.arrow.right`) en la barra de navegación superior derecha.
 - Al disparar la búsqueda (`onSubmit`), la UI interrumpe la interacción con un overlay translúcido + `ProgressView`.
 - **Diccionario de Íconos:** Los lugares deben renderizar un ícono dependiendo de su categoría (`MKPointOfInterestCategory`). Ejemplos mínimos requeridos: `.airport` (`airplane`), `.bank` (`building.columns.fill`), `.cafe` (`cup.and.saucer.fill`), `.restaurant` (`fork.knife`), `.hospital` (`cross.case.fill`), `.park` (`leaf.fill`), `.store` (`bag.fill`), fallback default (`mappin.and.ellipse`).
 - La celda de la lista replica el diseño objetivo: contenedor de icono redondeado (radius 8) fondo rojo pastel (`Color.red.opacity(0.15)`), icono rojo oscuro (`Color.red`), título principal en negritas (`headline`), subtítulo gris (`subheadline`) con formato "X.X km • [Estado]" y `chevron.right` final.
 - Si la metadata del `MKMapItem` no permite conocer el estado, el subtítulo mostrará "Horario no disponible".
-- El toque en un marcador interactivo o una celda prepara el `NavigationLink` hacia `AboutThePlaceView`.
+- Hacer tap en una celda de la lista utiliza `NavigationLink` para ir a `AboutThePlaceView`. Para los marcadores del mapa se utiliza otra estrategia. Al hacer un push a la nueva vista, el tabbar se debe ocultar.
 - Empty State visual: Mensaje "No encontramos resultados para '[Término]'. Intenta con otra búsqueda." con ícono `magnifyingglass`.
 - Error de Red: Alerta Título "Error de búsqueda", Mensaje "Hubo un problema al buscar lugares. Revisa tu conexión a internet e intenta de nuevo."
 
