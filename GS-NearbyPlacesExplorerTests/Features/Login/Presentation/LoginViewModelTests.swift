@@ -29,6 +29,14 @@ final class LoginViewModelTests: XCTestCase {
             return resultToReturn
         }
     }
+
+    struct MockHasStoredSessionUC: HasStoredSessionUC {
+        var hasStoredSession: Bool
+
+        nonisolated func execute() async -> Result<Bool, Error> {
+            .success(hasStoredSession)
+        }
+    }
     
     // MARK: - Tests
     
@@ -40,6 +48,7 @@ final class LoginViewModelTests: XCTestCase {
         
         let sut = LoginViewModel(router: router)
         sut.signInUC = signInUC
+        sut.hasStoredSessionUC = MockHasStoredSessionUC(hasStoredSession: false)
         sut.restoreSignInUC = restoreUC
         
         await sut.signIn(presentingViewController: UIViewController())
@@ -58,6 +67,7 @@ final class LoginViewModelTests: XCTestCase {
         
         let sut = LoginViewModel(router: router)
         sut.signInUC = signInUC
+        sut.hasStoredSessionUC = MockHasStoredSessionUC(hasStoredSession: false)
         sut.restoreSignInUC = restoreUC
         
         await sut.signIn(presentingViewController: UIViewController())
@@ -76,6 +86,7 @@ final class LoginViewModelTests: XCTestCase {
         
         let sut = LoginViewModel(router: router)
         sut.signInUC = signInUC
+        sut.hasStoredSessionUC = MockHasStoredSessionUC(hasStoredSession: false)
         sut.restoreSignInUC = restoreUC
         
         await sut.signIn(presentingViewController: UIViewController())
@@ -95,6 +106,7 @@ final class LoginViewModelTests: XCTestCase {
         
         let sut = LoginViewModel(router: router)
         sut.signInUC = signInUC
+        sut.hasStoredSessionUC = MockHasStoredSessionUC(hasStoredSession: false)
         sut.restoreSignInUC = restoreUC
         
         await sut.signIn(presentingViewController: UIViewController())
@@ -114,11 +126,13 @@ final class LoginViewModelTests: XCTestCase {
         
         let sut = LoginViewModel(router: router)
         sut.signInUC = signInUC
+        sut.hasStoredSessionUC = MockHasStoredSessionUC(hasStoredSession: true)
         sut.restoreSignInUC = restoreUC
         
         await sut.checkExistingSession()
         
-        XCTAssertTrue(sut.isAuthenticated)
+        XCTAssertFalse(sut.isAuthenticated)
+        XCTAssertFalse(sut.isLoading)
         XCTAssertEqual(sut.userProfile, profile)
         XCTAssertEqual(router.root, .main)
     }
@@ -130,11 +144,29 @@ final class LoginViewModelTests: XCTestCase {
         
         let sut = LoginViewModel(router: router)
         sut.signInUC = signInUC
+        sut.hasStoredSessionUC = MockHasStoredSessionUC(hasStoredSession: true)
         sut.restoreSignInUC = restoreUC
         
         await sut.checkExistingSession()
         
         XCTAssertFalse(sut.isAuthenticated)
+        XCTAssertNil(sut.userProfile)
+        XCTAssertEqual(router.root, .login)
+    }
+
+    func test_checkExistingSession_withoutStoredSession_staysIdle() async {
+        let signInUC = MockSignInUC(resultToReturn: .failure(AuthError.unknown))
+        let restoreUC = MockRestoreSignInUC(resultToReturn: .success(LoginEntity(id: "1", name: "Test", email: "test@test.com", profileImageURL: nil)))
+        let router = AppRouter()
+
+        let sut = LoginViewModel(router: router)
+        sut.signInUC = signInUC
+        sut.hasStoredSessionUC = MockHasStoredSessionUC(hasStoredSession: false)
+        sut.restoreSignInUC = restoreUC
+
+        await sut.checkExistingSession()
+
+        XCTAssertFalse(sut.isLoading)
         XCTAssertNil(sut.userProfile)
         XCTAssertEqual(router.root, .login)
     }
