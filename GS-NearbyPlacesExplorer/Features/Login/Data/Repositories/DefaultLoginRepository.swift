@@ -19,6 +19,10 @@ public final class DefaultLoginRepository: LoginGateway {
   /// Initializes a new instance of `DefaultLoginRepository`.
   public init() {}
 
+  public func hasStoredSession() -> Bool {
+    (try? localDataSource.getToken()) != nil
+  }
+
   /// Authenticates the user and saves the session token locally.
   /// - Parameter presenting: The view controller to present the authentication UI on.
   /// - Returns: A result containing the authenticated `LoginEntity` or an error.
