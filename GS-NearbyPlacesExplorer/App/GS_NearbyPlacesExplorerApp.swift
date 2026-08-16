@@ -15,7 +15,12 @@ struct GS_NearbyPlacesExplorerApp: App {
     @Provider var remoteDataSource: LoginRemoteDataSource = LoginService()
     @Provider var loginGateway: LoginGateway = DefaultLoginRepository()
     @Provider var signInUC: any SignInUC = SignInUCImpl()
+    @Provider var hasStoredSessionUC: any HasStoredSessionUC = HasStoredSessionUCImpl()
     @Provider var restoreSignInUC: any RestoreSignInUC = RestoreSignInUCImpl()
+    
+    @Provider var nearbyPlacesService: NearbyPlacesRemoteDataSource = NearbyPlacesService()
+    @Provider var nearbyPlacesGateway: NearbyPlacesGateway = NearbyPlacesRepository()
+    @Provider var fetchNearbyPlacesUC: any FetchNearbyPlacesUC = FetchNearbyPlacesUCImpl()
     
     @State private var router = AppRouter()
     @State private var loginViewModel: LoginViewModel
@@ -24,6 +29,17 @@ struct GS_NearbyPlacesExplorerApp: App {
         let initialRouter = AppRouter()
         self._router = State(initialValue: initialRouter)
         self._loginViewModel = State(initialValue: LoginViewModel(router: initialRouter))
+        
+        // Define cross-module logout boundary
+        initialRouter.performLogout = {
+            let storage = LoginStorage()
+            try? storage.deleteToken()
+            
+            Task { @MainActor in
+                initialRouter.path = NavigationPath()
+                initialRouter.root = .login
+            }
+        }
     }
     
     var sharedModelContainer: ModelContainer = {
@@ -46,15 +62,7 @@ struct GS_NearbyPlacesExplorerApp: App {
                 case .login:
                     LoginView(viewModel: loginViewModel)
                 case .main:
-                    NavigationStack(path: $router.path) {
-                        Text("Nearby Places View") // Placeholder
-                            .navigationDestination(for: Destination.self) { destination in
-                                switch destination {
-                                case .nearbyPlaces:
-                                    Text("Nearby Places Detail")
-                                }
-                            }
-                    }
+                    NearbyPlacesView(viewModel: NearbyPlacesViewModel())
                 }
             }
             .animation(.easeInOut, value: router.root)
