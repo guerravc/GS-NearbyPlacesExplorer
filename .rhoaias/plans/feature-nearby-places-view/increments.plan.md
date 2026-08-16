@@ -5,25 +5,25 @@ isProject: false
 todos:
   - id: 1
     content: "Create LocationManager & Info.plist Config"
-    status: pending
+    status: completed
   - id: 2
     content: "Implement Data & Domain Layers (Service, Repository, UseCase)"
-    status: pending
+    status: completed
   - id: 3
     content: "Implement POICategoryMapper (AppCore)"
-    status: pending
+    status: completed
   - id: 4
     content: "Develop Presentation Primitives (Map, List, Cell)"
-    status: pending
+    status: completed
   - id: 5
     content: "Implement NearbyPlacesViewModel State & Orchestration"
-    status: pending
+    status: completed
   - id: 6
     content: "Integrate Root View (TabView, Overlay, Alerts)"
-    status: pending
+    status: completed
   - id: 7
     content: "Implement Logout Functionality"
-    status: pending
+    status: completed
   - id: 7
     content: "Implement Logout Functionality"
     status: pending
@@ -160,6 +160,70 @@ todos:
 - Add dynamic list animations (`withAnimation`) when rendering new results.
 
 ## Self Code Review
+
+### Increment Outcome: 1 — Create LocationManager & Info.plist Config
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::1 **Goal:** | `GS-NearbyPlacesExplorer/AppCore/Location/LocationManager.swift` | pass |
+| Applicable invariants verified | required — OWN-001, FAIL-001 | `LocationManager.swift` is `@MainActor` and maps `authorizationStatus` | pass |
+| Boundary/dependency direction verified | not applicable — internal wrapper component not crossing architectural layers | N/A | n/a |
+| Failure/stale/cancel/rollback paths verified | required — Location denial (FAIL-001) | `LocationManager.swift` correctly sets `isDenied = true` on `.denied` | pass |
+
+### Increment Outcome: 2 — Implement Data & Domain Layers
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::2 **Goal:** | Data & Domain layers implemented (`DefaultNearbyPlacesService`, `FetchNearbyPlacesUC`) | pass |
+| Applicable invariants verified | required — OWN-002, BND-001 | `MKLocalSearch` is strictly inside `DefaultNearbyPlacesService`. `NearbyPlacesGateway` and `NearbyPlacesEntity` have no MapKit import. `FetchNearbyPlacesUC` is a pure passthrough. | pass |
+| Boundary/dependency direction verified | required — Domain must not depend on Data | `FetchNearbyPlacesUC` depends on `NearbyPlacesGateway` protocol. `DefaultNearbyPlacesRepository` adopts it. | pass |
+| Failure/stale/cancel/rollback paths verified | not applicable — no specific failure path in this increment | N/A | n/a |
+
+### Increment Outcome: 3 — Implement POICategoryMapper
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::3 **Goal:** | `POICategoryMapper` enum maps 15+ categories | pass |
+| Applicable invariants verified | required — BND-001 | Fallback `mappin.and.ellipse` and tests written. MapKit types not imported in logic directly. | pass |
+| Boundary/dependency direction verified | not applicable — internal utility | N/A | n/a |
+| Failure/stale/cancel/rollback paths verified | not applicable — pure functional map | N/A | n/a |
+
+### Increment Outcome: 4 — Develop Presentation Primitives
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::4 **Goal:** | Created `NearbyPlacesMapView`, `NearbyPlacesListView`, `PlaceListCell`, and `NearbyPlacesModel` | pass |
+| Applicable invariants verified | required — BND-001, INV-002 | `PlaceListCell` uses `.red.opacity(0.15)`. Views only consume `NearbyPlacesModel`. | pass |
+| Boundary/dependency direction verified | required — Presentation primitives must not leak MapKit | UI only expects `NearbyPlacesModel` | pass |
+| Failure/stale/cancel/rollback paths verified | not applicable | N/A | n/a |
+
+### Increment Outcome: 5 — Implement NearbyPlacesViewModel State & Orchestration
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::5 **Goal:** | Created `NearbyPlacesViewModel` and wired state transitions | pass |
+| Applicable invariants verified | required — INV-002, FAIL-002 | `state` manages loading, success, and `.empty`. `.empty` maps Domain empties to product strings. | pass |
+| Boundary/dependency direction verified | not applicable | N/A | n/a |
+| Failure/stale/cancel/rollback paths verified | required — FAIL-002 | Empty arrays trigger specific empty states with queries. Tests passed. | pass |
+
+### Increment Outcome: 6 — Integrate Root View
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::6 **Goal:** | Integrated `NearbyPlacesView` with `LocationManager`, SegmentedControl, Overlays. | pass |
+| Applicable invariants verified | required — INV-001, FAIL-001 | `.allowsHitTesting(false)` added to `loadingOverlay`. `isDenied` renders retry view. | pass |
+| Boundary/dependency direction verified | not applicable | N/A | n/a |
+| Failure/stale/cancel/rollback paths verified | required — FAIL-001 | Location denied paths verified via `locationManager.isDenied`. | pass |
+
+### Increment Outcome: 7 — Implement Logout Functionality
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::7 **Goal:** | Added logout button to Toolbar resetting `AppRouter` and deleting token. | pass |
+| Applicable invariants verified | required — BND-001 | `AppRouter` injects closure, preventing `NearbyPlaces` from importing `Login` directly. | pass |
+| Boundary/dependency direction verified | required — BND-001 | `NearbyPlacesView` triggers `router.performLogout?()`, unaware of TokenStorage. | pass |
+| Failure/stale/cancel/rollback paths verified | not applicable | N/A | n/a |
+
 | Obligation | Review Oracle |
 |---|---|
 | INV-001 | Overlay uses `.allowsHitTesting(false)` to block UI during loading state. |
@@ -178,6 +242,42 @@ todos:
 - **Coverage Strategy:**
   - **Unit:** ViewModels must be injected with mocked Use Cases. `POICategoryMapper` requires an exhaustive switch test. Service layers require mocked network/MapKit interceptors if testable.
   - **UI / Integration:** Excluded from scope; behavior relies on SwiftUI previews.
+
+### Increment Verification: 1 — Create LocationManager & Info.plist Config
+- **Scoped tests:** None affected or created. Full suite run as scoped fallback.
+- **Result:** Build passed. 18 tests passed, 0 failed.
+- **Oracles:** Manual verification for FAIL-001 will be needed in Increment 6.
+
+### Increment Verification: 2 — Implement Data & Domain Layers
+- **Scoped tests:** None affected or created. Full suite run as scoped fallback.
+- **Result:** Build passed. 18 tests passed, 0 failed.
+- **Oracles:** None requested for manual test here.
+
+### Increment Verification: 3 — Implement POICategoryMapper
+- **Scoped tests:** Unit tests written (`POICategoryMapperTests.swift`).
+- **Result:** Build passed. 21 tests passed (including new tests), 0 failed.
+- **Oracles:** Exhaustive switch test oracle satisfied.
+
+### Increment Verification: 4 — Develop Presentation Primitives
+- **Scoped tests:** None affected or created. Full suite run as scoped fallback.
+- **Result:** Build passed. 21 tests passed, 0 failed.
+- **Oracles:** BND-001 formatting inspected manually in the code (.red.opacity(0.15)).
+
+### Increment Verification: 5 — Implement NearbyPlacesViewModel State & Orchestration
+- **Scoped tests:** Created `NearbyPlacesViewModelTests.swift` testing state transitions.
+- **Result:** Build passed. 25 tests passed (including new tests), 0 failed.
+- **Oracles:** FAIL-002 automated test oracle fulfilled correctly mapping Domain errors to view empty strings.
+
+### Increment Verification: 6 — Integrate Root View
+- **Scoped tests:** None affected or created. Full suite run as scoped fallback.
+- **Result:** Build passed. 25 tests passed, 0 failed.
+- **Oracles:** Manual review on INV-001 (.allowsHitTesting(false)) and FAIL-001 (Location permission error view).
+
+### Increment Verification: 7 — Implement Logout Functionality
+- **Scoped tests:** None created, logic resides in SwiftUI environment closures mapping boundaries. Full suite run as scoped fallback.
+- **Result:** Build passed. 25 tests passed, 0 failed.
+- **Oracles:** Manual review on BND-001 boundary separation verifying `NearbyPlaces` does not import `Login` or `LoginStorage`.
+
 - **Coverage Mapping:**
 
 | Behavior / Failure | Obligation | Test Layer | Assertion / Oracle |
