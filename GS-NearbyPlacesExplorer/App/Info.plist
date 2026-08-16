@@ -13,5 +13,7 @@
 	</array>
 	<key>GIDClientID</key>
 	<string>932404941288-06a6h6p8een7ndf92effs8qenrt50gle.apps.googleusercontent.com</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Necesitamos tu ubicación para calcular las distancias y mostrar lugares cercanos. Por favor, habilítala en las preferencias de tu dispositivo.</string>
 </dict>
 </plist>
