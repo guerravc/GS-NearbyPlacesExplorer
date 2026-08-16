@@ -12,6 +12,9 @@ import Foundation
 /// This gateway defines the contract used by the domain layer (use cases)
 /// to interact with data sources (remote and/or local) for authentication.
 public protocol LoginGateway: Sendable {
+
+  /// Indicates whether a locally persisted session is available for restoration.
+  func hasStoredSession() -> Bool
   
   /// Authenticates the user.
   ///
