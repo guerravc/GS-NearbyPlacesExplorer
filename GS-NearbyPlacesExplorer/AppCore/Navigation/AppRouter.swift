@@ -22,4 +22,7 @@ final class AppRouter {
     var root: AppRoot = .login
     /// The navigation path stack for hierarchical navigation.
     var path = NavigationPath()
+    
+    /// Closure to be injected by the App composition root to perform cross-module logout
+    public var performLogout: (() -> Void)? = nil
 }
