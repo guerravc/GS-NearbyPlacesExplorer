@@ -5,29 +5,26 @@
 ### Component Hierarchy
 ```text
 NearbyPlacesView (Root)
-├── NavigationStack
-│   ├── Logout Button (Toolbar)
-│   ├── searchable(text: $query)
-│   ├── ProgressView Overlay (ZStack)
-│   └── TabView
-│       ├── NearbyPlacesMapView
-│       │   └── Map
-│       │       └── Marker
-│       └── NearbyPlacesListView
-│           └── List
-│               └── NavigationLink
-│                   └── PlaceListCell
+└── TabView
+    ├── Tab (Map)
+    │   └── NavigationStack -> NearbyPlacesMapView
+    ├── Tab (List)
+    │   └── NavigationStack -> NearbyPlacesListView
+    └── Tab (Search)
+        └── NavigationStack -> Search overlay (preserves lastContentTab) + .searchable
 ```
 
 ### Layout and Visual Properties
 | Element | Visual Treatment |
 |---|---|
-| Search Bar Placeholder | "Buscar lugares cercanos" |
-| TabBar Icon (Map) | `map` |
+| Search Bar Placeholder | "Buscar lugares" |
+| TabBar Icon (Map) | `map.fill` |
 | TabBar Icon (List) | `list.bullet` |
-| Map Recenter Button | Floating `location.fill` symbol |
-| Cell Background | `Color.red.opacity(0.15)` |
-| Cell Corner Radius | `8` |
+| TabBar Icon (Search) | `magnifyingglass` (Right floating button) |
+| Map Recenter Button | Floating `location.fill` symbol (bottom padding to avoid tab bar) |
+| Cell Container | Card style with rounded corners |
+| Cell Background | Explicit white background (`Color.white`) with subtle border for high contrast |
+| List Margins | Horizontal 16pt |
 | Cell Icon Color | `Color.red` |
 | Cell Chevron | Trailing `chevron.right` |
 
