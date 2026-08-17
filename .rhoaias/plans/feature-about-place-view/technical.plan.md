@@ -4,6 +4,14 @@ overview: "Architecture and technical plan for About The Place View"
 isProject: false
 task_id: feature-about-place-view
 version: 1.0.0
+todos:
+  - id: val-classification-missing
+    content: "The `classification` field is missing from `status.md`."
+    status: completed
+    kind: validation
+    artifact: status.md
+    dimension: Classification
+    proposed_resolution: "Add `classification: standard` to the root of `status.md` (or the appropriate classification level)."
 ---
 
 ## Problem Framing
