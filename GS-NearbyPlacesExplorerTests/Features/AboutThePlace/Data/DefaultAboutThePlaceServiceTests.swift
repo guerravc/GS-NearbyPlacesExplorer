@@ -23,6 +23,7 @@ final class MockAPIRequestDispatcher: APIRequestDispatching, @unchecked Sendable
     }
 }
 
+@MainActor
 struct DefaultAboutThePlaceServiceTests {
 
     @Test func test_fetchElementDetails_success_returnsElement() async throws {
