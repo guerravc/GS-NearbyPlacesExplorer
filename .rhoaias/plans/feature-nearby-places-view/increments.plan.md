@@ -1,32 +1,50 @@
 ---
-name: "Nearby Places Feature"
-overview: "Implement Clean Architecture layers (Data, Domain, Presentation) for Nearby Places, consuming MKLocalSearch via Use Cases, and presenting a Map/List TabView with location permissions."
+name: Nearby Places Feature
+overview: Implement Clean Architecture layers (Data, Domain, Presentation) for Nearby Places, consuming MKLocalSearch via Use Cases, and presenting a Map/List TabView with location permissions.
 isProject: false
 todos:
-  - id: 1
-    content: "Create LocationManager & Info.plist Config"
-    status: completed
-  - id: 2
-    content: "Implement Data & Domain Layers (Service, Repository, UseCase)"
-    status: completed
-  - id: 3
-    content: "Implement POICategoryMapper (AppCore)"
-    status: completed
-  - id: 4
-    content: "Develop Presentation Primitives (Map, List, Cell)"
-    status: completed
-  - id: 5
-    content: "Implement NearbyPlacesViewModel State & Orchestration"
-    status: completed
-  - id: 6
-    content: "Integrate Root View (TabView, Overlay, Alerts)"
-    status: completed
-  - id: 7
-    content: "Implement Logout Functionality"
-    status: completed
-  - id: 7
-    content: "Implement Logout Functionality"
-    status: pending
+- id: 1
+  content: Create LocationManager & Info.plist Config
+  status: completed
+- id: 2
+  content: Implement Data & Domain Layers (Service, Repository, UseCase)
+  status: completed
+- id: 3
+  content: Implement POICategoryMapper (AppCore)
+  status: completed
+- id: 4
+  content: Develop Presentation Primitives (Map, List, Cell)
+  status: completed
+- id: 5
+  content: Implement NearbyPlacesViewModel State & Orchestration
+  status: completed
+- id: 6
+  content: Integrate Root View (TabView, Overlay, Alerts)
+  status: completed
+- id: 7
+  content: Implement Logout Functionality
+  status: completed
+- id: '8'
+  content: 'Increment 8: Fix searchable prompt string'
+  status: pending
+- id: '9'
+  content: 'Increment 9: Fix location denied title string'
+  status: pending
+- id: '10'
+  content: 'Increment 10: Setup Environment Configuration (.xcconfig)'
+  status: pending
+- id: '11'
+  content: 'Increment 11: Implement APIConfiguration User-Agent Header'
+  status: pending
+- id: '12'
+  content: 'Increment 12: Implement OSMOpeningHoursParser'
+  status: pending
+- id: '13'
+  content: 'Increment 13: Migrate NearbyPlacesService to Overpass API'
+  status: pending
+- id: '14'
+  content: 'Increment 14: Map dynamic opening_hours to PlaceListCell UI'
+  status: pending
 ---
 
 ## Increments
@@ -287,3 +305,186 @@ todos:
 | Category fallback | BND-001 | Unit | Mapper returns `mappin.and.ellipse` for unknown categories. |
 | Location denial alert | FAIL-001 | Manual | Mocking location denial flips the UI presentation state for the alert. |
 | Empty search results | FAIL-002 | Unit | Empty response from Use Case translates strictly to "No encontramos resultados...". |
+
+## Remediation increments
+
+### Increment 8: Fix searchable prompt string (finding R001-F001: Minor, dev-fault)
+
+**Goal:** Modify the `.searchable` prompt to exactly match the DoD requirement; verified by UI displaying the exact string.
+
+**Steps:**
+1. Modify `NearbyPlacesView.swift` to change the `prompt` parameter of `.searchable` from `"Buscar lugares"` to `"Buscar lugares cercanos"`.
+
+**Files modified:**
+- `GS-NearbyPlacesExplorer/Features/NearbyPlaces/Presentation/View/NearbyPlacesView.swift`
+
+**Files created:**
+- None — no new files needed
+
+**Tests affected:**
+- None — no existing tests are impacted by this change
+
+**Tests created:**
+- None — no new tests required for this scope
+
+### Increment 9: Fix location denied title string (finding R001-F002: Minor, dev-fault)
+
+**Goal:** Update the location denied view title to exactly match the DoD requirement; verified by UI displaying the exact string when location is denied.
+
+**Steps:**
+1. Modify `NearbyPlacesView.swift` to change the `Text` view in `locationDeniedView` from `"Ubicación Denegada"` to `"Ubicación necesaria"`.
+
+**Files modified:**
+- `GS-NearbyPlacesExplorer/Features/NearbyPlaces/Presentation/View/NearbyPlacesView.swift`
+
+**Files created:**
+- None — no new files needed
+
+**Tests affected:**
+- None — no existing tests are impacted by this change
+
+**Tests created:**
+- None — no new tests required for this scope
+
+### Increment 10: Setup Environment Configuration (.xcconfig) (finding R003-F001: Major, plan-fault)
+
+**Goal:** Create `.xcconfig` environment files and map API URLs into `AppConfiguration`; verified by `AppConfiguration` returning valid URLs in tests.
+
+**Steps:**
+1. Create `Debug.xcconfig` and `Release.xcconfig` files defining `API_SCHEME=https`, `API_HOST=overpass-api.de`, and `API_BASE_PATH=/api/interpreter`.
+   - What could go wrong: Typos in xcconfig files prevent the app from building or loading variables.
+   - Quick verification: Compile the app and ensure `Bundle.main.infoDictionary` contains the keys.
+   - Obligations: None.
+2. Map these variables to `Info.plist` keys matching `AppConfiguration.InfoKey`.
+   - What could go wrong: `Info.plist` mapping uses incorrect syntax (e.g. missing `$()`).
+   - Quick verification: Xcode displays the correctly evaluated variables in the target's Info tab.
+   - Obligations: None.
+3. Add accessors in `AppConfiguration.swift`.
+   - What could go wrong: `AppConfiguration` forcibly unwraps missing keys causing a crash.
+   - Quick verification: Unit tests verify `AppConfiguration.apiBaseURL` constructs safely.
+   - Obligations: None.
+
+**Files modified:**
+- `GS-NearbyPlacesExplorer/Info.plist`
+- `GS-NearbyPlacesExplorer/Networking/Configuration/AppConfiguration.swift`
+
+**Files created:**
+- `Config/Debug.xcconfig`
+- `Config/Release.xcconfig`
+
+**Tests affected:**
+- None — no existing tests are impacted by this change
+
+**Tests created:**
+- `GS-NearbyPlacesExplorerTests/Networking/Configuration/AppConfigurationTests.swift`
+
+### Increment 11: Implement APIConfiguration User-Agent Header (finding R003-F002: Major, plan-fault)
+
+**Goal:** Append a globally constructed `User-Agent` to `DefaultHTTPConfiguration` headers using `AppInfo`; verified by unit tests asserting the `User-Agent` header exists.
+
+**Steps:**
+1. In `APIConfiguration.swift`, modify `DefaultHTTPConfiguration.headers` to include a `User-Agent` constructed using `AppInfo.appName`, `AppInfo.shortVersion`, and `AppInfo.osName`.
+   - What could go wrong: Special characters in AppInfo fields create an invalid HTTP header.
+   - Quick verification: The constructed string is URL-safe or strictly alphanumeric.
+   - Obligations: None.
+
+**Files modified:**
+- `GS-NearbyPlacesExplorer/Networking/Configuration/APIConfiguration.swift`
+
+**Files created:**
+- None — no new files needed
+
+**Tests affected:**
+- None — no existing tests are impacted by this change
+
+**Tests created:**
+- `GS-NearbyPlacesExplorerTests/Networking/Configuration/APIConfigurationTests.swift`
+
+### Increment 12: Implement OSMOpeningHoursParser (finding R003-F003: Major, plan-fault)
+
+**Goal:** Implement an `OSMOpeningHoursParser` utility to map the 5 specific OSM time strings to an Enum with three states (`open`, `closed`, `notAvailable`); verified by exhaustive unit test coverage of the 5 scenarios.
+
+**Steps:**
+1. Create `OSMOpeningHoursParser.swift` defining the state Enum (`open`, `closed`, `notAvailable`).
+   - What could go wrong: The parser logic is placed inside a View or Service layer.
+   - Quick verification: The parser is an isolated, pure Swift structure in the Domain layer.
+   - Obligations: BND-001.
+2. Implement parsing logic explicitly supporting: "Mo-Fr 08:00-17:00", "Mo-Fr 08:00-12:00,13:00-17:30", "Mo,We 08:00-12:00", and "Mo-Fr 08:00-12:00,13:00-17:30; Sa 08:00-12:00" mapping them to the `open` or `closed` states of the Enum.
+   - What could go wrong: The regex or string splitting logic is too brittle and fails on unexpected whitespace.
+   - Quick verification: Unit tests cover edge cases for spacing.
+   - Obligations: None.
+3. Add a fallback that returns the `notAvailable` Enum state for any other format.
+   - What could go wrong: Fallback throws an error instead of gracefully returning `notAvailable`.
+   - Quick verification: Passing a random string returns `notAvailable` immediately.
+   - Obligations: None.
+
+**Files modified:**
+- None — no existing files require changes
+
+**Files created:**
+- `GS-NearbyPlacesExplorer/Features/NearbyPlaces/Domain/Utils/OSMOpeningHoursParser.swift`
+
+**Tests affected:**
+- None — no existing tests are impacted by this change
+
+**Tests created:**
+- `GS-NearbyPlacesExplorerTests/Features/NearbyPlaces/Domain/Utils/OSMOpeningHoursParserTests.swift`
+
+### Increment 13: Migrate NearbyPlacesService to Overpass API (finding R002-F001: Major, plan-fault)
+
+**Goal:** Migrate `MKLocalSearch` to `APIRequestDispatcher` and `NearbyPlacesAPIRouter` to fetch POIs via Overpass API; verified by mocked unit tests returning `NearbyPlacesEntity` arrays.
+
+**Steps:**
+1. Implement `OverpassResponse` DTO and `NearbyPlacesAPIRouter` utilizing `AppConfiguration` endpoints.
+   - What could go wrong: The `OverpassQL` query body is malformed.
+   - Quick verification: `NearbyPlacesAPIRouter` correctly formats the POST body via `APIRequestBuilder`.
+   - Obligations: OWN-002.
+2. Inject `APIRequestDispatching` into `DefaultNearbyPlacesService`.
+   - What could go wrong: Over-injection causes circular dependencies or tests fail to compile.
+   - Quick verification: Dependency is injected via initializer, `MKLocalSearch` dependencies are removed.
+   - Obligations: BND-001.
+3. Fetch data using the dispatcher, parse `opening_hours` using `OSMOpeningHoursParser`, and map `OSMElement` to `NearbyPlacesEntity`.
+   - What could go wrong: Missing `opening_hours` tags crash the DTO decoder.
+   - Quick verification: `opening_hours` is marked as optional in `OSMElement`.
+   - Obligations: None.
+
+**Files modified:**
+- `GS-NearbyPlacesExplorer/Features/NearbyPlaces/Data/DataSource/Services/DefaultNearbyPlacesService.swift`
+- `GS-NearbyPlacesExplorer/Features/NearbyPlaces/Domain/Entities/NearbyPlacesEntity.swift`
+
+**Files created:**
+- `GS-NearbyPlacesExplorer/Features/NearbyPlaces/Data/Networking/NearbyPlacesAPIRouter.swift`
+- `GS-NearbyPlacesExplorer/Features/NearbyPlaces/Data/Models/OverpassResponse.swift`
+
+**Tests affected:**
+- `GS-NearbyPlacesExplorerTests/Features/NearbyPlaces/Data/NearbyPlacesServiceTests.swift`
+
+**Tests created:**
+- `GS-NearbyPlacesExplorerTests/Features/NearbyPlaces/Data/NearbyPlacesAPIRouterTests.swift`
+
+### Increment 14: Map dynamic opening_hours to PlaceListCell UI (finding R002-F001: Major, plan-fault)
+
+**Goal:** Update `NearbyPlacesModel` and `PlaceListCell` to propagate and render the parsed Enum state; verified by UI previews displaying the correct schedule string.
+
+**Steps:**
+1. Update `NearbyPlacesModel` to carry the Enum state (`open`, `closed`, `notAvailable`) instead of the optional boolean `isOpen`.
+   - What could go wrong: Model mapping incorrectly handles the Enum default cases.
+   - Quick verification: Model init handles the Enum property natively.
+   - Obligations: None.
+2. Update `PlaceListCell` to render "Abierto", "Cerrado" or "Horario no disponible" directly based on the Enum state cases.
+   - What could go wrong: UI layout breaks due to longer text strings.
+   - Quick verification: SwiftUI Preview shows correct text truncation or wrapping.
+   - Obligations: None.
+
+**Files modified:**
+- `GS-NearbyPlacesExplorer/Features/NearbyPlaces/Presentation/Model/NearbyPlacesModel.swift`
+- `GS-NearbyPlacesExplorer/Features/NearbyPlaces/Presentation/View/Components/PlaceListCell.swift`
+
+**Files created:**
+- None — no new files needed
+
+**Tests affected:**
+- None — no existing tests are impacted by this change
+
+**Tests created:**
+- None — no new tests required for this scope

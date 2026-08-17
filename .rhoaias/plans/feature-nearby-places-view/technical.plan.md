@@ -31,6 +31,60 @@ todos:
     artifact: multiple
     dimension: Definition Alignment
     proposed_resolution: "Remove A11y criteria from dor.plan.md, dod.plan.md, analysis.product.md, and specs.design.md. Explicitly declare A11y/VoiceOver in the Out of Scope section of dor.plan.md."
+  - id: dod-amendment-r002
+    content: "- **Business Hours Data**: The hardcoded MapKit fallback string must be replaced."
+    status: completed
+    kind: amendment_dod
+    artifact: dod.plan.md
+    dimension: Business Hours Data
+    proposed_resolution: Fetch `opening_hours` tag from Overpass API. Display the raw string if present, otherwise display "Horario no disponible".
+    source_artifact: review.remediation.md
+    source_section: "## Proposed DoD Amendments"
+    source_bullet: "- **Business Hours Data**: The hardcoded MapKit fallback string must be replaced."
+  - id: plan-correction-r002
+    content: "- **technical.plan.md | Data Layer Architecture**: `MKLocalSearch` is obsolete."
+    status: completed
+    kind: validation
+    artifact: technical.plan.md
+    dimension: Data Layer Architecture
+    proposed_resolution: Replace `MKLocalSearch` usage with `NearbyPlacesAPIRouter` (via `https://overpass-api.de/api/interpreter`) using the `APIRequestDispatcher`. Update DTOs to parse `OSMElement`.
+    source_artifact: review.remediation.md
+    source_section: "## Proposed Plan Corrections"
+    source_bullet: "- **technical.plan.md | Data Layer Architecture**: `MKLocalSearch` is obsolete."
+  - id: dod-amendment-r003
+    content: "- **Business Hours Parsing**: Replace the previous amendment."
+    status: completed
+    kind: amendment_dod
+    artifact: dod.plan.md
+    dimension: Business Hours Parsing
+    proposed_resolution: The `opening_hours` tag must be parsed. If it matches one of the 5 specific scenarios (Common, Multiple intervals, Multiple days same periods, Multiple days multiple periods), it must evaluate to `Bool` (Abierto/Cerrado). Any other scenario must fallback to `nil` ("Horario no disponible").
+    source_artifact: review.remediation.md
+    source_section: "## Proposed DoD Amendments"
+    source_bullet: "- **Business Hours Parsing**: Replace the previous amendment."
+  - id: plan-correction-r003
+    content: "- **technical.plan.md | Network Configuration**:"
+    status: completed
+    kind: validation
+    artifact: technical.plan.md
+    dimension: Network Configuration
+    proposed_resolution: Update to reflect that Overpass API URLs are supplied via `Debug.xcconfig` / `Release.xcconfig` and consumed by `AppConfiguration`, and `User-Agent` is managed by `APIConfiguration`.
+    source_artifact: review.remediation.md
+    source_section: "## Proposed Plan Corrections"
+    source_bullet: "- **technical.plan.md | Network Configuration**:"
+  - id: val-inc12-enum-gap
+    content: Increment 12 goal and steps use boolean state instead of the required Enum (open, closed, notAvailable) defined in dod.plan.md.
+    status: completed
+    kind: validation
+    artifact: increments.plan.md
+    dimension: Definition Alignment
+    proposed_resolution: Update Increment 12 goal and steps to parse into an Enum with three states (open, closed, notAvailable) instead of a boolean.
+  - id: val-inc14-enum-gap
+    content: Increment 14 uses optional boolean isOpen instead of the required Enum (open, closed, notAvailable) defined in dod.plan.md.
+    status: completed
+    kind: validation
+    artifact: increments.plan.md
+    dimension: Definition Alignment
+    proposed_resolution: Update Increment 14 goal and steps to propagate and render the new Enum state rather than an optional boolean `isOpen`.
 ---
 
 ## Problem Framing
@@ -41,9 +95,10 @@ Currently, the "Vista 2" (Nearby Places View) exists only as boilerplate files. 
 - **Pattern:** Clean Architecture (Data, Domain, Presentation layers) with MVVM and SwiftUI Observation.
 - **Async model:** Swift 5.7+ `async/await` for MapKit searches and location fetching.
 - **Location Management:** A dedicated `@Observable` `LocationManager` wrapping `CLLocationManager` in the AppCore module.
-- **Data Layer:** `DefaultNearbyPlacesService` encapsulates `MKLocalSearch` using modern iOS 26 `MKMapItem.location` and returns `NearbyPlacesDTO`. `DefaultNearbyPlacesRepository` maps DTOs to Domain `NearbyPlacesEntity`.
+- **Data Layer:** `DefaultNearbyPlacesService` encapsulates `NearbyPlacesAPIRouter` (via `https://overpass-api.de/api/interpreter`) using the `APIRequestDispatcher` and returns `NearbyPlacesDTO` parsed from `OSMElement`. `DefaultNearbyPlacesRepository` maps DTOs to Domain `NearbyPlacesEntity`.
 - **Domain Layer:** `FetchNearbyPlacesUC` is the Use Case invoked by the ViewModel to retrieve entities via the `NearbyPlacesGateway` interface.
 - **Authentication Initialization:** `HasStoredSessionUC` orchestrates silent background session validation during app launch to prevent UI flickering on the Login screen.
+- **Network Configuration:** Overpass API URLs are supplied via `Debug.xcconfig` / `Release.xcconfig` and consumed by `AppConfiguration`. The `User-Agent` is managed centrally by `APIConfiguration`.
 - **Presentation Layer:** `NearbyPlacesViewModel` holds the search state (`query`, `results`, `isLoading`), mapping `NearbyPlacesEntity` to `NearbyPlacesModel`. The view layer remains completely decoupled from `MKMapItem`.
 - **Navigation & Search Architecture (iOS 18+):** Currently `TabView` is the root container and wraps `NavigationStack` per tab. The Search Tab (`role: .search`) preserves the previous content context (`lastContentTab`) and utilizes `.searchable(isPresented:)` natively. The searchable placeholder is "Buscar lugares cercanos".
 - **Routing Strategy:** The list handles routing to `AboutThePlaceView` using `NavigationLink`, while the map markers use another strategy to achieve the same goal. When pushing to the detail view, the tab bar is explicitly hidden.

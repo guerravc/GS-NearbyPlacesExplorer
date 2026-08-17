@@ -10,3 +10,4 @@
 - [ ] Hacer tap en una celda de la lista acciona el enrutamiento (`NavigationLink`) hacia `AboutThePlaceView`. Los marcadores del mapa usan una estrategia diferente. En ambos flujos, el tabbar se oculta al hacer push.
 - [ ] El ViewModel dispone de pruebas unitarias validando estados y el Helper/Mapper de Iconos dispone de tests validando las conversiones.
 - [ ] El código compila sin errores ni advertencias bajo el standard de Swift 6.
+- [ ] Fetch `opening_hours` tag from Overpass API. The tag must be parsed into an Enum with tres estados (`open`, `closed`, `notAvailable`). Si hace match con uno de los 5 escenarios específicos, se evalúa a `open` o `closed`. Cualquier otro escenario debe caer en `notAvailable` ("Horario no disponible").
