@@ -1,50 +1,36 @@
-// 
+//
 //  DefaultAboutThePlaceStorage.swift
 //  GS-NearbyPlacesExplorer
 //
-//  Created by Carlos Lopez on 14/08/26.
+//  Created by Carlos Guerra
 //
 
 import Foundation
 
-/// Default local storage implementation for the AboutThePlace module.
-///
-/// This type provides a minimal, no-op implementation of the local data source.
-/// Developers may replace or extend this type depending on the module’s
-/// persistence needs (e.g., UserDefaults, files, caches, databases).
-public final class DefaultAboutThePlaceStorage: AboutThePlaceLocalDataSource {
-  
-  /// Creates a new instance of the storage layer.
-  public init() { }
-  
-  // MARK: - AboutThePlaceLocalDataSource
-  
-  /// Loads a cached entity from local storage, if available.
-  /// - Returns: The cached entity or `nil` if no value is stored.
-  /// - Throws: An error if the read operation fails.
-  public func loadCachedEntity() async throws -> AboutThePlaceEntity? {
-    // TODO: Implement actual local storage loading mechanism.
-    // Example implementations may use:
-    // - UserDefaults
-    // - FileManager
-    // - SQLite/CoreData
-    // - NSCache
-    return nil
-  }
-  
-  /// Saves the given entity to local storage.
-  /// - Parameter entity: The entity to persist locally.
-  /// - Throws: An error if the write operation fails.
-  public func save(
-    _ entity: AboutThePlaceEntity
-  ) async throws {
-    // TODO: Implement actual local persistence mechanism.
-    // This function intentionally does nothing by default.
-  }
-  
-  /// Clears any cached data from the local storage.
-  /// - Throws: An error if the clear operation fails.
-  public func clearCache() async throws {
-    // TODO: Implement local cache clearing.
-  }
+private final class AboutThePlaceEntityWrapper: @unchecked Sendable {
+    let entity: AboutThePlaceEntity
+    init(entity: AboutThePlaceEntity) {
+        self.entity = entity
+    }
+}
+
+public final class DefaultAboutThePlaceStorage: AboutThePlaceLocalDataSource, @unchecked Sendable {
+    private let cache = NSCache<NSNumber, AboutThePlaceEntityWrapper>()
+    private let lock = NSLock()
+    
+    public init() {}
+    
+    public func getPlaceDetails(osmId: Int) async -> AboutThePlaceEntity? {
+        let key = NSNumber(value: osmId)
+        return lock.withLock {
+            cache.object(forKey: key)?.entity
+        }
+    }
+    
+    public func savePlaceDetails(_ entity: AboutThePlaceEntity) async {
+        let key = NSNumber(value: entity.osmId)
+        lock.withLock {
+            cache.setObject(AboutThePlaceEntityWrapper(entity: entity), forKey: key)
+        }
+    }
 }

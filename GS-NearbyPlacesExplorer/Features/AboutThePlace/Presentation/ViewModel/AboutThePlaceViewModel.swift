@@ -1,105 +1,95 @@
-// 
+//
 //  AboutThePlaceViewModel.swift
 //  GS-NearbyPlacesExplorer
 //
-//  Created by Carlos Lopez on 14/08/26.
+//  Created by Carlos Guerra
 //
 
-import Observation
 import Foundation
 
-/// Contract for the AboutThePlace view model.
-///
-/// This protocol defines all presentation requirements the View relies on.
-/// It allows mocking or replacing the view model in tests or previews.
-@MainActor
-protocol AboutThePlaceViewModelProtocol: AnyObject {
-    var title: String { get }
-    var state: AboutThePlaceViewModel.ViewState { get }
 
-    func onAppear() async
-    func reload() async
-}
 
-/// Default `@Observable` implementation of the module's view model.
-///
-/// This type manages loading state, errors, and data presentation
-/// for the `AboutThePlaceView`.
-///
-/// Replace the stubbed async calls with real logic depending on
-/// your project's architecture (Clean, Networking, Services, etc.).
-///
-/// - ADR-004: `@MainActor` is applied for Swift 6 strict concurrency readiness.
-///   While `@Observable` handles SwiftUI observation correctly without it in
-///   Swift 5.9, strict concurrency checking requires explicit main-actor isolation
-///   for types that mutate state observed by the UI.
 @MainActor
 @Observable
-final class AboutThePlaceViewModel: AboutThePlaceViewModelProtocol {
-
-    // MARK: - ViewState
-
-    /// Represents the possible presentation states of the view.
-    enum ViewState {
-        /// Initial state before any data has been requested.
-        case idle
-        /// Data is being fetched.
-        case loading
-        /// Data was loaded successfully.
-        case loaded([AboutThePlaceModel])
-        /// An error occurred while fetching data.
-        case error(String)
+public final class AboutThePlaceViewModel {
+    public private(set) var isLoading: Bool = false
+    public var showError: Bool = false
+    public var errorMessage: String? = nil
+    
+    public private(set) var placeDetails: AboutThePlaceDetailModel? = nil
+    public private(set) var isFavorite: Bool = false
+    
+    @ObservationIgnored
+    @Inject var fetchPlaceDetailsUC: any FetchPlaceDetailsUC
+    
+    @ObservationIgnored
+    @Inject var checkFavoriteStatusUC: any CheckFavoriteStatusUC
+    
+    @ObservationIgnored
+    @Inject var toggleFavoritePlaceUC: any ToggleFavoritePlaceUC
+    
+    @ObservationIgnored
+    @Inject var restoreSignInUC: any RestoreSignInUC
+    
+    public init() {}
+    
+    private var userEmail: String? = nil
+    
+    public func onAppear(osmId: Int) async {
+        isLoading = true
+        showError = false
+        
+        let sessionResult = await restoreSignInUC.execute()
+        if case .success(let profile) = sessionResult {
+            self.userEmail = profile.email
+        }
+        
+        async let fetchDetailsTask = fetchPlaceDetailsUC.execute(osmId)
+        
+        // We only check favorite status if we have a user email
+        let checkFavoriteTask: () async -> Result<Bool, Error> = {
+            if let email = self.userEmail {
+                return await self.checkFavoriteStatusUC.execute(CheckFavoriteStatusInput(osmId: osmId, userEmail: email))
+            } else {
+                return .failure(NSError(domain: "Auth", code: -1, userInfo: nil))
+            }
+        }
+        
+        let detailsResult = await fetchDetailsTask
+        let favoriteResult = await checkFavoriteTask()
+        
+        switch detailsResult {
+        case .success(let entity):
+            let model = AboutThePlaceDetailModel(entity: entity)
+            self.placeDetails = model
+        case .failure(let error):
+            self.errorMessage = error.localizedDescription
+            self.showError = true
+        }
+        
+        switch favoriteResult {
+        case .success(let isFav):
+            self.isFavorite = isFav
+        case .failure:
+            self.isFavorite = false
+        }
+        
+        isLoading = false
     }
-
-    // MARK: - Presentation State
-
-    /// Title displayed in the navigation bar.
-    var title: String = "AboutThePlace"
-
-    /// Current presentation state of the view.
-    var state: ViewState = .idle
-
-    // MARK: - Init
-
-    init() { }
-
-    // MARK: - Public Methods
-
-    /// Called when the view appears for the first time.
-    func onAppear() async {
-        await loadData()
-    }
-
-    /// Reloads the data on user demand (pull-to-refresh or retry).
-    func reload() async {
-        await loadData()
-    }
-
-    // MARK: - Private Helpers
-
-    /// Simulates an async load operation.
-    ///
-    /// Replace this placeholder with your actual logic:
-    /// - calling a service
-    /// - interacting with a use case
-    /// - using the networking core
-    private func loadData() async {
-        state = .loading
-
-        do {
-            try await Task.sleep(for: .seconds(1)) // Simulated delay
-
-            let items: [AboutThePlaceModel] = [
-                .init(id: UUID(), title: "Item 1", subtitle: "Example A"),
-                .init(id: UUID(), title: "Item 2", subtitle: "Example B"),
-                .init(id: UUID(), title: "Item 3", subtitle: nil)
-            ]
-
-            state = .loaded(items)
-        } catch is CancellationError {
-            return
-        } catch {
-            state = .error("Unable to load data.")
+    
+    public func toggleFavorite() {
+        guard let model = placeDetails, let email = userEmail else { return }
+        
+        let newFavStatus = !isFavorite
+        self.isFavorite = newFavStatus
+        
+        Task {
+            let entity = FavoritePlaceEntity(userEmail: email, osmId: model.osmId, name: model.name)
+            let result = await toggleFavoritePlaceUC.execute(entity)
+            if case .failure = result {
+                // Revert on failure
+                self.isFavorite = !newFavStatus
+            }
         }
     }
 }

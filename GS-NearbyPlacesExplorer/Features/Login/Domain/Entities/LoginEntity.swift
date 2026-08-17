@@ -7,82 +7,32 @@
 
 import Foundation
 
-/// Domain models for the Login module.
-///
-/// This file is intended to be customized per feature. It contains:
-/// - The main entity used by the module (pure domain, no serialization).
-/// - A request model to send data to the backend.
-/// - A response model to represent the result from the backend.
-///
-/// You can rename, extend or remove these types depending on your use case.
-///
-/// Serialization is handled by separate DTO types in the Data layer,
-/// keeping domain models free of `Codable` coupling.
-nonisolated public struct LoginEntity: Equatable, Sendable {
-  /// Example identifier for the entity.
-  public let id: UUID
-  /// Example display name for the entity.
+/// Core domain entity for the Login module representing the authenticated user.
+public struct LoginEntity: Equatable, Sendable {
+  /// The unique identifier of the user.
+  public let id: String
+  /// The full name of the user.
   public let name: String
-  /// Example detail or level property for the entity.
-  public let detail: String
+  /// The email address of the user.
+  public let email: String
+  /// An optional URL for the user's profile image.
+  public let profileImageURL: URL?
 
-  /// Creates a new instance of `LoginEntity`.
+  /// Initializes a new `LoginEntity`.
   /// - Parameters:
-  ///   - id: Unique identifier of the entity.
-  ///   - name: Display name of the entity.
-  ///   - detail: Additional detail or level associated with the entity.
-  public init(
-    id: UUID,
+  ///   - id: The unique identifier.
+  ///   - name: The user's full name.
+  ///   - email: The user's email address.
+  ///   - profileImageURL: The optional profile image URL.
+  nonisolated public init(
+    id: String,
     name: String,
-    detail: String
+    email: String,
+    profileImageURL: URL?
   ) {
     self.id = id
     self.name = name
-    self.detail = detail
-  }
-}
-
-/// Request model used to send parameters required by the Login module.
-/// This type is typically encoded and sent as JSON in the request body or as query parameters.
-nonisolated public struct LoginRequest: Codable, Equatable, Sendable {
-  /// Example parameter used to identify or filter the request.
-  public let identifier: String
-  /// Example parameter used to pass additional payload to the backend.
-  public let payload: String
-
-  /// Creates a new instance of `LoginRequest`.
-  /// - Parameters:
-  ///   - identifier: Identifier used to correlate or filter the request.
-  ///   - payload: Additional payload required by the backend.
-  public init(
-    identifier: String,
-    payload: String
-  ) {
-    self.identifier = identifier
-    self.payload = payload
-  }
-}
-
-/// Response model representing the domain result for the Login module.
-/// This type wraps the main entity and allows you to attach additional metadata.
-///
-/// The corresponding `Codable` DTO (`LoginResponseDTO`) lives in the
-/// Data layer and provides `toDomain()` mapping.
-nonisolated public struct LoginResponse: Equatable, Sendable {
-  /// The main entity returned by the backend.
-  public let entity: LoginEntity
-  /// Example additional numeric value returned by the backend.
-  public let extraValue: Int
-
-  /// Creates a new instance of `LoginResponse`.
-  /// - Parameters:
-  ///   - entity: The main entity returned by the backend.
-  ///   - extraValue: Additional numeric value associated with the response.
-  public init(
-    entity: LoginEntity,
-    extraValue: Int
-  ) {
-    self.entity = entity
-    self.extraValue = extraValue
+    self.email = email
+    self.profileImageURL = profileImageURL
   }
 }

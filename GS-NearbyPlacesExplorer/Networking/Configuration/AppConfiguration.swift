@@ -65,21 +65,42 @@ public enum AppConfiguration {
 
 // MARK: - Typed Networking Values
 public extension AppConfiguration {
+
+  private static func configuredString(for key: InfoKey) -> String? {
+    guard let value: String = try? value(for: key) else { return nil }
+
+    let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmedValue.isEmpty, !trimmedValue.hasPrefix("$(") else { return nil }
+
+    return trimmedValue
+  }
+
+  private static func isValidURLScheme(_ value: String) -> Bool {
+    value.range(
+      of: "^[A-Za-z][A-Za-z0-9+.-]*$",
+      options: .regularExpression
+    ) != nil
+  }
   
   /// Scheme used by the API (e.g., "https").
   static var apiScheme: String {
-    (try? value(for: .apiScheme)) ?? "https"
+    guard let configuredScheme = configuredString(for: .apiScheme),
+          isValidURLScheme(configuredScheme) else {
+      return "https"
+    }
+
+    return configuredScheme
   }
   
   /// Host name of the API (e.g., "api.example.com").
   static var apiHost: String {
-    (try? value(for: .apiHost)) ?? ""
+    configuredString(for: .apiHost) ?? "overpass-api.de"
   }
   
   /// Base path for the API version (default: "/v1").
   /// - Important: Developers may update this manually if API versioning changes.
   static var apiBasePath: String {
-    (try? value(for: .apiBasePath)) ?? "/v1"
+    configuredString(for: .apiBasePath) ?? "/api/interpreter"
   }
   
   /// Full base URL constructed from scheme, host and base path.
