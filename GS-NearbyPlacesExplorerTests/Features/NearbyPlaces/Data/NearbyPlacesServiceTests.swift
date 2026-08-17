@@ -41,7 +41,7 @@ final class NearbyPlacesServiceTests: XCTestCase {
               "tags": {
                 "amenity": "cafe",
                 "name": "Test Cafe",
-                "opening_hours": "Mo-Fr 08:00-17:00"
+                "opening_hours": "24/7"
               }
             }
           ]
@@ -59,7 +59,7 @@ final class NearbyPlacesServiceTests: XCTestCase {
         XCTAssertEqual(models[0].pointOfInterestCategory, "cafe")
         XCTAssertEqual(models[0].latitude, 19.4326)
         XCTAssertEqual(models[0].longitude, -99.1332)
-        XCTAssertEqual(models[0].openingState, .closed) // We don't know the exact time when running the test, but the parser works
+        XCTAssertEqual(models[0].openingState, .open)
     }
     
     func test_search_failure_throwsError() async {
