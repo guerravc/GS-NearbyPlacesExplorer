@@ -69,8 +69,8 @@ public struct NearbyPlacesListView: View {
 
 #Preview("NearbyPlacesListView") {
     let places = [
-        NearbyPlacesEntity(id: "1", name: "El Buen Café", coordinate: (19.43, -99.13), category: "MKPOICategoryCafe", address: "Calle 1"),
-        NearbyPlacesEntity(id: "2", name: "Parque Central", coordinate: (19.44, -99.14), category: "MKPOICategoryPark", address: "Avenida 2")
+        NearbyPlacesEntity(id: "1", name: "El Buen Café", coordinate: (19.43, -99.13), category: "cafe", address: "Calle 1"),
+        NearbyPlacesEntity(id: "2", name: "Restaurante Central", coordinate: (19.44, -99.14), category: "restaurant", address: "Avenida 2")
     ]
     NearbyPlacesListView(places: places, currentLocation: nil)
 }
