@@ -164,8 +164,7 @@ public struct NearbyPlacesView: View {
     }
     .ignoresSafeArea(edges: .bottom)
     .navigationDestination(for: NearbyPlacesEntity.self) { place in
-      Text("Detalles de \(place.name)")
-        .navigationTitle(place.name)
+      AboutThePlaceView(placeId: place.id, placeName: place.name)
         .toolbar(.hidden, for: .tabBar)
     }
   }
