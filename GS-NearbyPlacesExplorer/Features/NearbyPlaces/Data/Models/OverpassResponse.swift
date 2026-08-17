@@ -14,9 +14,15 @@ public struct OverpassResponse: Decodable, Sendable {
 public struct OSMElement: Decodable, Sendable {
     public let type: String
     public let id: Int
+    public let lat: Double?
+    public let lon: Double?
+    public let center: OSMCenter?
+    public let tags: OSMTags?
+}
+
+public struct OSMCenter: Decodable, Sendable {
     public let lat: Double
     public let lon: Double
-    public let tags: OSMTags?
 }
 
 public struct OSMTags: Decodable, Sendable {
