@@ -26,6 +26,8 @@ public struct NearbyPlacesView: View {
   }
 
   public var body: some View {
+    @Bindable var bindableViewModel = viewModel
+
     TabView(selection: $selectedTab) {
       Tab("Mapa", systemImage: "map.fill", value: .map) {
         tabContent(for: .map, title: "Mapa")
@@ -40,6 +42,14 @@ public struct NearbyPlacesView: View {
       }
     }
     .tabViewStyle(.sidebarAdaptable)
+    .alert("Error al buscar lugares", isPresented: $bindableViewModel.showError) {
+      Button("Reintentar") {
+        viewModel.retryLastSearch()
+      }
+      Button("Cerrar", role: .cancel) { }
+    } message: {
+      Text(viewModel.errorMessage ?? "No fue posible completar la búsqueda.")
+    }
     .onChange(of: selectedTab) { _, tab in
       switch tab {
       case .map, .list:
@@ -65,7 +75,7 @@ public struct NearbyPlacesView: View {
             ))
         }
         if oldLocation == nil {
-          performSearch()
+          scheduleSearch()
         }
       }
     }
@@ -100,11 +110,10 @@ public struct NearbyPlacesView: View {
       )
       .searchPresentationToolbarBehavior(.avoidHidingContent)
       .onSubmit(of: .search) {
-        performSearch()
+        submitSearch()
       }
-      .onChange(of: viewModel.query) { previousQuery, query in
-        guard !previousQuery.isEmpty, query.isEmpty else { return }
-        performSearch()
+      .onChange(of: viewModel.query) { _, _ in
+        scheduleSearch()
       }
       .onAppear {
         isSearchPresented = true
@@ -131,7 +140,7 @@ public struct NearbyPlacesView: View {
       } else {
         Group {
           switch viewModel.state {
-          case .idle, .loading:
+          case .idle:
             if isMap {
               mapView(items: [], activeTab: activeTab)
             } else {
@@ -145,18 +154,12 @@ public struct NearbyPlacesView: View {
             }
           case .empty(let message):
             if isMap {
-              mapView(items: [], activeTab: activeTab).overlay(emptyView(message: message))
+              mapView(items: [], activeTab: activeTab)
             } else {
               emptyView(message: message)
             }
-          case .error(let message):
-            errorView(message: message)
           }
         }
-      }
-
-      if case .loading = viewModel.state {
-        loadingOverlay.allowsHitTesting(false)
       }
     }
     .ignoresSafeArea(edges: .bottom)
@@ -230,18 +233,6 @@ public struct NearbyPlacesView: View {
       .map(\.element)
   }
 
-  private var loadingOverlay: some View {
-    ZStack {
-      Color.black.opacity(0.2)
-        .ignoresSafeArea()
-      ProgressView("Buscando...")
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(8)
-        .shadow(radius: 4)
-    }
-  }
-
   private var locationDeniedView: some View {
     VStack(spacing: 16) {
       Image(systemName: "location.slash.fill")
@@ -263,46 +254,48 @@ public struct NearbyPlacesView: View {
     }
   }
 
-  private func errorView(message: String) -> some View {
-    VStack(spacing: 12) {
-      Text(message)
-        .font(.body)
-        .multilineTextAlignment(.center)
-        .padding(.horizontal, 24)
-
-      Button(action: {
-        performSearch()
-      }) {
-        Text("Reintentar")
-          .font(.body.weight(.semibold))
-      }
-      .buttonStyle(.bordered)
-    }
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
-  }
-
   private func emptyView(message: String) -> some View {
-    VStack(spacing: 8) {
+    VStack(spacing: 16) {
+      ZStack {
+        RoundedRectangle(cornerRadius: 32)
+          .fill(Color.blue.opacity(0.15))
+          .frame(width: 120, height: 120)
+
+        Image(systemName: "magnifyingglass")
+          .font(.system(size: 50, weight: .medium))
+          .foregroundStyle(.blue)
+          .offset(x: -8, y: -8)
+
+        Image(systemName: "xmark.circle.fill")
+          .font(.system(size: 28, weight: .medium))
+          .foregroundStyle(.blue)
+          .background(Circle().fill(.white))
+          .offset(x: 24, y: 24)
+      }
+
+      Text("Sin resultados")
+        .font(.title3.weight(.bold))
+
       Text(message)
         .font(.body)
-        .multilineTextAlignment(.center)
-        .padding(.horizontal)
-      Text("Intenta de nuevo.")
-        .font(.footnote)
         .foregroundStyle(.secondary)
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, 32)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color(.systemBackground).opacity(0.8))
+    .background(Color(.systemBackground))
   }
 
-  private func performSearch() {
+  private func scheduleSearch() {
     let lat = locationManager.location?.coordinate.latitude ?? 19.4326
     let lng = locationManager.location?.coordinate.longitude ?? -99.1332
+    viewModel.scheduleSearch(latitude: lat, longitude: lng)
+  }
 
-    Task {
-      await viewModel.search(
-        latitude: lat, longitude: lng, query: viewModel.query.isEmpty ? nil : viewModel.query)
-    }
+  private func submitSearch() {
+    let lat = locationManager.location?.coordinate.latitude ?? 19.4326
+    let lng = locationManager.location?.coordinate.longitude ?? -99.1332
+    viewModel.submitSearch(latitude: lat, longitude: lng)
   }
 }
 
@@ -310,14 +303,6 @@ public struct NearbyPlacesView: View {
   let mockUC = MockFetchNearbyPlacesUC()
   let vm = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
   NearbyPlacesView(viewModel: vm)
-    .environment(AppRouter())
-}
-
-#Preview("Loading") {
-  let mockUC = MockFetchNearbyPlacesUC()
-  let vm = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
-  vm.state = .loading
-  return NearbyPlacesView(viewModel: vm)
     .environment(AppRouter())
 }
 
@@ -347,8 +332,8 @@ public struct NearbyPlacesView: View {
 #Preview("Error State") {
   let mockUC = MockFetchNearbyPlacesUC()
   let vm = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
-  vm.state = .error(
-    "Hubo un problema al buscar lugares. Revisa tu conexión a internet e intenta de nuevo.")
+  vm.errorMessage = "Hubo un problema al buscar lugares. Revisa tu conexión a internet e intenta de nuevo."
+  vm.showError = true
   return NearbyPlacesView(viewModel: vm)
     .environment(AppRouter())
 }
