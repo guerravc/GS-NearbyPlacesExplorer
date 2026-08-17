@@ -74,7 +74,7 @@ public struct NearbyPlacesMapView: View {
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     ))
     let places = [
-        NearbyPlacesEntity(id: "1", name: "Café", coordinate: (19.43, -99.13), category: "MKPOICategoryCafe", address: nil)
+        NearbyPlacesEntity(id: "1", name: "Café", coordinate: (19.43, -99.13), category: "cafe", address: nil)
     ]
     NearbyPlacesMapView(
         places: places,
