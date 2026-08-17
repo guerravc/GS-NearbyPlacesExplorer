@@ -15,5 +15,9 @@
 	<string>932404941288-06a6h6p8een7ndf92effs8qenrt50gle.apps.googleusercontent.com</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Necesitamos tu ubicación para calcular las distancias y mostrar lugares cercanos. Por favor, habilítala en las preferencias de tu dispositivo.</string>
+	<key>API_SCHEME</key>
+	<string>$(API_SCHEME)</string>
+	<key>API_HOST</key>
+	<string>$(API_HOST)</string>
 </dict>
 </plist>
