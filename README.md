@@ -22,7 +22,7 @@ Aplicación iOS para descubrir lugares cercanos, buscarlos por nombre, visualiza
 1. Clona el repositorio y entra al directorio.
 
    ```bash
-   git clone <URL_DEL_REPOSITORIO>
+   git clone https://github.com/guerravc/GS-NearbyPlacesExplorer.git
    cd GS-NearbyPlacesExplorer
    ```
 
