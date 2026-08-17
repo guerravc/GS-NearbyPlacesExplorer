@@ -55,8 +55,43 @@ public final class NearbyPlacesViewModel: NearbyPlacesViewModelProtocol {
             } else {
                 state = .loaded(entities)
             }
-        case .failure:
-            state = .error("Hubo un problema al buscar lugares. Revisa tu conexión a internet e intenta de nuevo.")
+        case .failure(let error):
+            state = .error(searchErrorMessage(for: error))
+        }
+    }
+
+    private func searchErrorMessage(for error: Error) -> String {
+        guard let networkError = error as? NetworkError else {
+            return "Hubo un problema al buscar lugares. Revisa tu conexión a internet e intenta de nuevo."
+        }
+
+        switch networkError {
+        case .transportError(let error as URLError):
+            switch error.code {
+            case .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost, .cannotFindHost,
+                .dnsLookupFailed:
+                return "No fue posible conectarse al servicio de lugares. Revisa tu conexión e intenta de nuevo."
+            case .timedOut:
+                return "El servicio de lugares tardó demasiado en responder. Intenta de nuevo."
+            default:
+                return "No fue posible completar la solicitud al servicio de lugares."
+            }
+        case .transportError:
+            return "No fue posible completar la solicitud al servicio de lugares."
+        case .serverError(let statusCode, _):
+            return "El servicio de lugares respondió con el error \(statusCode.rawValue)."
+        case .unacceptableStatusCode(let statusCode, _):
+            return "El servicio de lugares respondió con el error \(statusCode)."
+        case .decodingError:
+            return "El servicio de lugares devolvió una respuesta que no pudimos procesar."
+        case .invalidURL:
+            return "La configuración del servicio de lugares no es válida."
+        case .noData:
+            return "El servicio de lugares no devolvió datos."
+        case .cancelled:
+            return "La búsqueda fue cancelada."
+        case .unknown:
+            return "Ocurrió un error inesperado al buscar lugares."
         }
     }
 }
