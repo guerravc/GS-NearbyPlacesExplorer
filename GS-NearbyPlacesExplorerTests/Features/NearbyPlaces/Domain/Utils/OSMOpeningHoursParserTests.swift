@@ -33,6 +33,28 @@ final class OSMOpeningHoursParserTests: XCTestCase {
         XCTAssertEqual(OSMOpeningHoursParser.state(for: "Random text 24/7"), .notAvailable)
     }
 
+    func test_alwaysOpen_returnsOpen() {
+        XCTAssertEqual(OSMOpeningHoursParser.state(for: "24/7"), .open)
+    }
+
+    func test_dailyHours_withoutDayRange_areEvaluated() {
+        XCTAssertEqual(
+            OSMOpeningHoursParser.state(for: "08:00-17:00", at: date(weekday: 1, hour: 10)),
+            .open
+        )
+        XCTAssertEqual(
+            OSMOpeningHoursParser.state(for: "08:00-17:00", at: date(weekday: 1, hour: 18)),
+            .closed
+        )
+    }
+
+    func test_overnightHours_areEvaluatedAcrossMidnight() {
+        XCTAssertEqual(
+            OSMOpeningHoursParser.state(for: "Mo-Su 18:00-02:00", at: date(weekday: 4, hour: 1)),
+            .open
+        )
+    }
+
     func test_singleRange_open() {
         let rules = "Mo-Fr 08:00-17:00"
         let wednesdayAt10 = date(weekday: 4, hour: 10)
