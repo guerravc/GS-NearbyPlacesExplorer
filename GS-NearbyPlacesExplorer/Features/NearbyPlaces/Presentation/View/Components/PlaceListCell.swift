@@ -76,13 +76,13 @@ public struct PlaceListCell: View {
 }
 
 #Preview("PlaceListCell - No Location") {
-    let place = NearbyPlacesEntity(id: "1", name: "El Buen Café", coordinate: (19.43, -99.13), category: "MKPOICategoryCafe", address: "Calle 1")
+    let place = NearbyPlacesEntity(id: "1", name: "El Buen Café", coordinate: (19.43, -99.13), category: "cafe", address: "Calle 1")
     PlaceListCell(model: place, currentLocation: nil)
         .padding()
 }
 
 #Preview("PlaceListCell - With Location") {
-    let place = NearbyPlacesEntity(id: "1", name: "El Buen Café", coordinate: (19.43, -99.13), category: "MKPOICategoryCafe", address: "Calle 1")
+    let place = NearbyPlacesEntity(id: "1", name: "El Buen Café", coordinate: (19.43, -99.13), category: "cafe", address: "Calle 1")
     PlaceListCell(model: place, currentLocation: CLLocation(latitude: 19.435, longitude: -99.135))
         .padding()
 }
