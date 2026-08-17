@@ -19,5 +19,7 @@
 	<string>$(API_SCHEME)</string>
 	<key>API_HOST</key>
 	<string>$(API_HOST)</string>
+	<key>API_BASE_PATH</key>
+	<string>$(API_BASE_PATH)</string>
 </dict>
 </plist>
