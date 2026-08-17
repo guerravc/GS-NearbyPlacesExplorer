@@ -15,8 +15,13 @@ public struct OSMOpeningHoursParser {
     ///   - date: The date to check against (defaults to now)
     /// - Returns: `open`, `closed`, or `notAvailable`
     public static func state(for hoursString: String?, at date: Date = Date()) -> PlaceOpeningState {
-        guard let hoursString = hoursString, !hoursString.isEmpty else {
+        guard let hoursString = hoursString?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !hoursString.isEmpty else {
             return .notAvailable
+        }
+
+        if hoursString == "24/7" {
+            return .open
         }
         
         let calendar = Calendar.current
@@ -32,19 +37,31 @@ public struct OSMOpeningHoursParser {
         var isOpen = false
         
         for rule in rules {
-            let components = rule.components(separatedBy: " ")
-            guard components.count >= 2 else { continue }
-            
-            let daysString = components[0]
-            let timesString = components[1]
-            
-            let ruleDays = parseDays(daysString)
-            guard !ruleDays.isEmpty else { continue }
+            let components = rule.split(whereSeparator: \.isWhitespace)
+            let ruleDays: Set<Int>
+            let timesString: String
+
+            if components.count >= 2, !parseDays(String(components[0])).isEmpty {
+                ruleDays = parseDays(String(components[0]))
+                timesString = components.dropFirst().joined()
+            } else if components.count == 1, containsValidTimeRange(String(components[0])) {
+                ruleDays = Set(1...7)
+                timesString = String(components[0])
+            } else {
+                continue
+            }
             
             parsedSuccessfully = true
             
             if ruleDays.contains(currentWeekday) {
                 matchesDay = true
+                let normalizedTimes = timesString.lowercased()
+
+                if normalizedTimes == "off" || normalizedTimes == "closed" {
+                    isOpen = false
+                    continue
+                }
+
                 let timeRanges = timesString.split(separator: ",")
                 for range in timeRanges {
                     let times = range.split(separator: "-")
@@ -52,7 +69,16 @@ public struct OSMOpeningHoursParser {
                         let startMins = parseTime(String(times[0]))
                         let endMins = parseTime(String(times[1]))
                         if startMins != -1 && endMins != -1 {
-                            if currentTimeInMinutes >= startMins && currentTimeInMinutes <= endMins {
+                            let isWithinRange: Bool
+                            if startMins <= endMins {
+                                isWithinRange = currentTimeInMinutes >= startMins
+                                    && currentTimeInMinutes <= endMins
+                            } else {
+                                isWithinRange = currentTimeInMinutes >= startMins
+                                    || currentTimeInMinutes <= endMins
+                            }
+
+                            if isWithinRange {
                                 isOpen = true
                                 break
                             }
@@ -71,6 +97,15 @@ public struct OSMOpeningHoursParser {
         }
         
         return .closed
+    }
+
+    private static func containsValidTimeRange(_ value: String) -> Bool {
+        value.split(separator: ",").contains { range in
+            let times = range.split(separator: "-")
+            return times.count == 2
+                && parseTime(String(times[0])) != -1
+                && parseTime(String(times[1])) != -1
+        }
     }
     
     private static func parseDays(_ daysString: String) -> Set<Int> {
@@ -117,7 +152,10 @@ public struct OSMOpeningHoursParser {
         let parts = timeString.split(separator: ":")
         if parts.count == 2,
            let hour = Int(parts[0].trimmingCharacters(in: .whitespaces)),
-           let minute = Int(parts[1].trimmingCharacters(in: .whitespaces)) {
+           let minute = Int(parts[1].trimmingCharacters(in: .whitespaces)),
+           (0...24).contains(hour),
+           (0...59).contains(minute),
+           hour < 24 || minute == 0 {
             return hour * 60 + minute
         }
         return -1
