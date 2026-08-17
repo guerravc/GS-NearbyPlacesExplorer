@@ -7,8 +7,8 @@
 
 import Foundation
 
-public enum NearbyPlacesAPIRouter: APIRouter {
-    case fetchPlaces(latitude: Double, longitude: Double, radius: Int = 1000)
+nonisolated public enum NearbyPlacesAPIRouter: APIRouter {
+    case fetchPlaces(latitude: Double, longitude: Double, radius: Int = 1000, query: String?)
     
     public var path: String {
         return ""
@@ -20,15 +20,15 @@ public enum NearbyPlacesAPIRouter: APIRouter {
     
     public var body: Data? {
         switch self {
-        case let .fetchPlaces(lat, lon, radius):
+        case let .fetchPlaces(lat, lon, radius, query):
+            let filter = overpassFilter(for: query)
             let query = """
             [out:json][timeout:25];
             (
-              node["amenity"](around:\(radius),\(lat),\(lon));
+              node[\(filter)](around:\(radius),\(lat),\(lon));
+              way[\(filter)](around:\(radius),\(lat),\(lon));
             );
-            out body;
-            >;
-            out skel qt;
+            out center;
             """
             
             var components = URLComponents()
@@ -39,5 +39,20 @@ public enum NearbyPlacesAPIRouter: APIRouter {
     
     public var headers: [String: String]? {
         return ["Content-Type": "application/x-www-form-urlencoded"]
+    }
+
+    private func overpassFilter(for query: String?) -> String {
+        guard let query = query?.trimmingCharacters(in: .whitespacesAndNewlines), !query.isEmpty else {
+            return "\"amenity\""
+        }
+
+        return "\"name\"~\"\(escapedForOverpassRegex(query))\",i"
+    }
+
+    private func escapedForOverpassRegex(_ value: String) -> String {
+        let specialCharacters = CharacterSet(charactersIn: #"\.^$|()[]{}*+?"#)
+        return value.unicodeScalars.map { scalar in
+            specialCharacters.contains(scalar) ? "\\\(String(scalar))" : String(scalar)
+        }.joined()
     }
 }
