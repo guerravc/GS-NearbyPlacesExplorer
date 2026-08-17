@@ -1,11 +1,21 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 import SwiftUI
 import CoreLocation
 
+/// Vertically scrollable list of nearby place cards.
+///
+/// Supports synchronized scroll anchoring so that switching from the map tab
+/// to the list tab scrolls the list to the last selected place.
 public struct NearbyPlacesListView: View {
+    /// Ordered list of places to display.
     public let places: [NearbyPlacesEntity]
+    /// Current user location used to compute distance shown on each cell.
     public let currentLocation: CLLocation?
+    /// The currently selected place, updated when the user taps a cell.
     @Binding public var selectedPlace: NearbyPlacesEntity?
+    /// The ID of the item the list should scroll to on first appearance.
     public let initialScrollAnchorID: NearbyPlacesEntity.ID?
+    /// Called whenever the visible scroll position changes, used to keep map and list in sync.
     public let onScrollAnchorChanged: (NearbyPlacesEntity.ID?) -> Void
     @State private var localScrollAnchorID: NearbyPlacesEntity.ID?
     

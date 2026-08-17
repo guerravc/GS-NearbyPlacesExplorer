@@ -1,12 +1,23 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 import SwiftUI
 import MapKit
 
+/// SwiftUI view that renders a MapKit map populated with nearby place annotations.
+///
+/// Handles camera position sync, tap-to-select annotations, and exposes
+/// a re-center button so the user can return to their current location.
 public struct NearbyPlacesMapView: View {
+    /// List of places to render as annotations on the map.
     public let places: [NearbyPlacesEntity]
+    /// Current camera position, updated by the map when the user pans or zooms.
     @Binding public var position: MapCameraPosition
+    /// The currently selected place, updated when the user taps an annotation.
     @Binding public var selectedPlace: NearbyPlacesEntity?
+    /// When `true`, the blue user-location dot is displayed on the map.
     public let showsUserLocation: Bool
+    /// Called with the tapped place whenever the user selects an annotation.
     public let onPlaceSelected: (NearbyPlacesEntity) -> Void
+    /// Called when the user taps the re-center button.
     public let onRecenterTapped: () -> Void
     
     public init(

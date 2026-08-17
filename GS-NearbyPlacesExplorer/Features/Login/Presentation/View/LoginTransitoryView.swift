@@ -1,3 +1,4 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 import SwiftUI
 
 /// A transitory view displayed immediately after a successful authentication.

@@ -1,3 +1,4 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 //
 //  OSMOpeningHoursParserTests.swift
 //  GS-NearbyPlacesExplorerTests

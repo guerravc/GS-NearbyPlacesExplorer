@@ -1,6 +1,16 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 import Foundation
 
+/// Maps OSM amenity category strings to SF Symbol icon names.
+///
+/// Used by ``PlaceListCell`` and ``NearbyPlacesMapView`` to display
+/// an appropriate icon for each category of point of interest.
 public enum POICategoryMapper: Sendable {
+    /// Returns the SF Symbol name that best represents the given OSM amenity category.
+    ///
+    /// Falls back to `"mappin.and.ellipse"` for unrecognized categories.
+    /// - Parameter category: The raw OSM amenity tag value (e.g., `"cafe"`, `"pharmacy"`).
+    /// - Returns: A system image name suitable for `Image(systemName:)`.
     public static func map(category: String) -> String {
         switch category {
         case "restaurant", "fast_food", "food_court":

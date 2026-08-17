@@ -1,8 +1,15 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 import SwiftUI
 import CoreLocation
 
+/// A single row cell displayed inside ``NearbyPlacesListView``.
+///
+/// Shows the place's category icon, name, distance from the user's location,
+/// and current opening state with color-coded text.
 public struct PlaceListCell: View {
+    /// The place entity to display.
     public let model: NearbyPlacesEntity
+    /// Current user location used to calculate and format the distance label.
     public let currentLocation: CLLocation?
     
     public init(model: NearbyPlacesEntity, currentLocation: CLLocation? = nil) {
@@ -10,6 +17,8 @@ public struct PlaceListCell: View {
         self.currentLocation = currentLocation
     }
     
+    /// Formatted distance string from the user to the place.
+    /// Returns an empty string when `currentLocation` is `nil`.
     private var distanceText: String {
         guard let currentLocation = currentLocation else { return "" }
         let placeLocation = CLLocation(latitude: model.coordinate.latitude, longitude: model.coordinate.longitude)
@@ -23,6 +32,7 @@ public struct PlaceListCell: View {
         return formatter.string(from: measurement)
     }
     
+    /// Localized opening status label derived from the place's ``PlaceOpeningState``.
     private var scheduleText: String {
         switch model.openingState {
         case .open: return "Abierto"
@@ -31,6 +41,7 @@ public struct PlaceListCell: View {
         }
     }
     
+    /// Color used to render the `scheduleText` label.
     private var scheduleColor: Color {
         switch model.openingState {
         case .open: return .green

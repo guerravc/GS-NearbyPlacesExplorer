@@ -1,3 +1,4 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 //
 //  AboutThePlaceView.swift
 //  GS-NearbyPlacesExplorer
@@ -8,8 +9,15 @@
 import SwiftUI
 import MapKit
 
+/// Detail screen for a selected point of interest.
+///
+/// Displays a map header with the place's pin, distance from the user,
+/// opening status, amenity type, and schedule. The user can mark/unmark
+/// the place as a favorite via the toolbar button or the bottom button.
 public struct AboutThePlaceView: View {
+    /// String representation of the OSM element ID.
     let placeId: String
+    /// Fallback display name used when the API does not return one.
     let placeName: String
     
     @State private var viewModel = AboutThePlaceViewModel()
@@ -21,6 +29,8 @@ public struct AboutThePlaceView: View {
         self.placeName = placeName
     }
     
+    /// Formatted distance string from the user's current location to the place.
+    /// Returns `"Cargando..."` while the location or place details are unavailable.
     private var distanceText: String {
         if let details = viewModel.placeDetails, let location = locationManager.location {
             let dest = CLLocation(latitude: details.coordinate.lat, longitude: details.coordinate.lon)
@@ -31,6 +41,11 @@ public struct AboutThePlaceView: View {
         return "Cargando..."
     }
     
+    /// Derives a human-readable opening status and its associated display color
+    /// by parsing the raw `opening_hours` string from OSM.
+    ///
+    /// Supports 24/7 values, basic `HH:mm-HH:mm` patterns, and empty strings.
+    /// Falls back to `"Horario irregular"` when the format is unrecognized.
     private var openStatusData: (text: String, color: Color) {
         guard let details = viewModel.placeDetails else { return ("Cargando...", .gray) }
         let hours = details.openingHours.lowercased()
@@ -170,6 +185,8 @@ public struct AboutThePlaceView: View {
 
     // MARK: - Subcomponents
 
+    /// Renders an interactive map centered on the place's coordinate,
+    /// or a placeholder illustration while the details are loading.
     private var headerView: some View {
         Group {
             if let details = viewModel.placeDetails {
@@ -199,6 +216,7 @@ public struct AboutThePlaceView: View {
         }
     }
 
+    /// Renders the rating and opening-status info boxes displayed side by side.
     private var infoBoxesView: some View {
         HStack(spacing: 16) {
             HStack {
@@ -229,6 +247,7 @@ public struct AboutThePlaceView: View {
         .fixedSize(horizontal: false, vertical: true)
     }
 
+    /// A full-width bottom button that lets the user toggle the favorite state.
     private var bottomFavoriteButton: some View {
         Button(action: {
             viewModel.toggleFavorite()

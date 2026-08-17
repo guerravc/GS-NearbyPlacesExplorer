@@ -66,6 +66,7 @@ public enum AppConfiguration {
 // MARK: - Typed Networking Values
 public extension AppConfiguration {
 
+  // AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
   private static func configuredString(for key: InfoKey) -> String? {
     guard let value: String = try? value(for: key) else { return nil }
 

@@ -1,3 +1,4 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 //
 //  GS_NearbyPlacesExplorerApp.swift
 //  GS-NearbyPlacesExplorer
@@ -33,9 +34,14 @@ struct GS_NearbyPlacesExplorerApp: App {
     @Provider var checkFavoriteStatusUC: any CheckFavoriteStatusUC = CheckFavoriteStatusUCImpl()
     @Provider var toggleFavoritePlaceUC: any ToggleFavoritePlaceUC = ToggleFavoritePlaceUCImpl()
     
+    /// Shared SwiftUI state for the selected root flow and navigation stack.
     @State private var router = AppRouter()
     @State private var loginViewModel: LoginViewModel
     
+    /// Configures the app router and wires the cross-module logout closure.
+    ///
+    /// The `performLogout` closure clears the stored token and resets the navigation
+    /// stack to the login root, ensuring no authenticated state leaks across sessions.
     init() {
         let initialRouter = AppRouter()
         self._router = State(initialValue: initialRouter)
@@ -53,6 +59,10 @@ struct GS_NearbyPlacesExplorerApp: App {
         }
     }
     
+    /// Shared SwiftData `ModelContainer` for on-device persistence.
+    ///
+    /// Registered schema includes ``FavoritePlace``. The container is created once
+    /// as a static property to avoid reinitialising SwiftData on every App body evaluation.
     static let sharedModelContainer: ModelContainer = {
         let schema = Schema([
             FavoritePlace.self,

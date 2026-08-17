@@ -1,3 +1,4 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 //
 //  AboutThePlaceViewModel.swift
 //  GS-NearbyPlacesExplorer
@@ -9,14 +10,24 @@ import Foundation
 
 
 
+/// View model for the AboutThePlace screen.
+///
+/// Orchestrates the initial data load (place details + favorite status),
+/// handles the optimistic toggle of the favorite state, and exposes
+/// error feedback to the view. Runs exclusively on the main actor.
 @MainActor
 @Observable
 public final class AboutThePlaceViewModel {
+    /// Whether an initial or retry load is in progress.
     public private(set) var isLoading: Bool = false
+    /// Controls presentation of the error alert.
     public var showError: Bool = false
+    /// Localized error message shown in the alert when `showError` is `true`.
     public var errorMessage: String? = nil
-    
+
+    /// Fully loaded place details model. `nil` while loading or on error.
     public private(set) var placeDetails: AboutThePlaceDetailModel? = nil
+    /// Whether the current user has marked this place as a favorite.
     public private(set) var isFavorite: Bool = false
     
     @ObservationIgnored
@@ -35,6 +46,12 @@ public final class AboutThePlaceViewModel {
     
     private var userEmail: String? = nil
     
+    /// Loads place details and favorite status concurrently when the view appears.
+    ///
+    /// The user session is restored first to obtain the authenticated email.
+    /// Both the details fetch and the favorite status check are then run in parallel.
+    ///
+    /// - Parameter osmId: The OSM element ID of the place to display.
     public func onAppear(osmId: Int) async {
         isLoading = true
         showError = false
@@ -77,6 +94,10 @@ public final class AboutThePlaceViewModel {
         isLoading = false
     }
     
+    /// Toggles the favorite state of the currently displayed place.
+    ///
+    /// Applies an optimistic update immediately so the UI responds without waiting
+    /// for the persistence layer. If the operation fails, the state is reverted.
     public func toggleFavorite() {
         guard let model = placeDetails, let email = userEmail else { return }
         

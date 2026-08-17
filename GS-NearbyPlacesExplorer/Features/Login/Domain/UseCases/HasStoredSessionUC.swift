@@ -1,3 +1,4 @@
+// AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
 import Foundation
 
 /// Async query Use Case for determining whether a local session can be restored.

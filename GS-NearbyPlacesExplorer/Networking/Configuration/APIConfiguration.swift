@@ -52,6 +52,7 @@ public struct DefaultHTTPConfiguration: HTTPConfiguration {
     result["Content-Type"] = "application/json"
     result["Accept"] = "application/json"
     
+    // AI-ASSISTED: generated with Antigravity IDE (gemini 3.1 pro)
     // Some backend APIs require a proper User-Agent
     let cleanAppName = AppInfo.appName.isEmpty ? "GS-NearbyPlacesExplorer" : AppInfo.appName
     let cleanVersion = AppInfo.shortVersion.isEmpty ? "1.0" : AppInfo.shortVersion
