@@ -6,8 +6,12 @@ public final class NearbyPlacesService: NearbyPlacesRemoteDataSource, @unchecked
     public init() {}
     
     public func search(latitude: Double, longitude: Double, query: String?) async throws -> [NearbyPlacesModel] {
-        // The query string is ignored in this Overpass implementation as we search by amenity.
-        let route = NearbyPlacesAPIRouter.fetchPlaces(latitude: latitude, longitude: longitude, radius: 1000)
+        let route = NearbyPlacesAPIRouter.fetchPlaces(
+            latitude: latitude,
+            longitude: longitude,
+            radius: 2000,
+            query: query
+        )
         
         let result = await dispatcher.perform(route)
         
@@ -17,7 +21,11 @@ public final class NearbyPlacesService: NearbyPlacesRemoteDataSource, @unchecked
             do {
                 let overpassResponse = try decoder.decode(OverpassResponse.self, from: response.data)
                 
-                return overpassResponse.elements.map { element in
+                return overpassResponse.elements.compactMap { element in
+                    guard let latitude = element.lat ?? element.center?.lat,
+                          let longitude = element.lon ?? element.center?.lon else {
+                        return nil
+                    }
                     let name = element.tags?.name ?? "Unknown Location"
                     let category = element.tags?.amenity ?? "unknown"
                     let openingState = OSMOpeningHoursParser.state(for: element.tags?.openingHours)
@@ -25,8 +33,8 @@ public final class NearbyPlacesService: NearbyPlacesRemoteDataSource, @unchecked
                     return NearbyPlacesModel(
                         id: String(element.id),
                         name: name,
-                        latitude: element.lat,
-                        longitude: element.lon,
+                        latitude: latitude,
+                        longitude: longitude,
                         pointOfInterestCategory: category,
                         title: nil, // Overpass doesn't provide a formatted address easily in this query
                         openingState: openingState
