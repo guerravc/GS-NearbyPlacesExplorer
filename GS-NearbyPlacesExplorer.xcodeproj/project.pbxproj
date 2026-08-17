@@ -18,20 +18,12 @@
 			remoteGlobalIDString = AEF543F4302E8694000A6CB0;
 			remoteInfo = "GS-NearbyPlacesExplorer";
 		};
-		AEF5440F302E8696000A6CB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AEF543ED302E8694000A6CB0 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AEF543F4302E8694000A6CB0;
-			remoteInfo = "GS-NearbyPlacesExplorer";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		61B062AAA108A37C64AF03D4 /* Debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = "GS-NearbyPlacesExplorer/App/Config/Debug.xcconfig"; sourceTree = "<group>"; };
 		AEF543F5302E8694000A6CB0 /* GS-NearbyPlacesExplorer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GS-NearbyPlacesExplorer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AEF54404302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GS-NearbyPlacesExplorerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AEF5440E302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GS-NearbyPlacesExplorerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00139BD19BDAF55863ECE09 /* Release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = "GS-NearbyPlacesExplorer/App/Config/Release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -61,11 +53,6 @@
 			path = "GS-NearbyPlacesExplorerTests";
 			sourceTree = "<group>";
 		};
-		AEF54411302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "GS-NearbyPlacesExplorerUITests";
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,13 +71,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AEF5440B302E8696000A6CB0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -99,7 +79,6 @@
 			children = (
 				AEF543F7302E8694000A6CB0 /* GS-NearbyPlacesExplorer */,
 				AEF54407302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests */,
-				AEF54411302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests */,
 				AEF543F6302E8694000A6CB0 /* Products */,
 				61B062AAA108A37C64AF03D4 /* Debug.xcconfig */,
 				B00139BD19BDAF55863ECE09 /* Release.xcconfig */,
@@ -111,7 +90,6 @@
 			children = (
 				AEF543F5302E8694000A6CB0 /* GS-NearbyPlacesExplorer.app */,
 				AEF54404302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests.xctest */,
-				AEF5440E302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,27 +141,6 @@
 			productReference = AEF54404302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		AEF5440D302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = AEF5441E302E8696000A6CB0 /* Build configuration list for PBXNativeTarget "GS-NearbyPlacesExplorerUITests" */;
-			buildPhases = (
-				AEF5440A302E8696000A6CB0 /* Sources */,
-				AEF5440B302E8696000A6CB0 /* Frameworks */,
-				AEF5440C302E8696000A6CB0 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				AEF54410302E8696000A6CB0 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				AEF54411302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests */,
-			);
-			name = "GS-NearbyPlacesExplorerUITests";
-			productName = "GS-NearbyPlacesExplorerUITests";
-			productReference = AEF5440E302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -198,10 +155,6 @@
 						CreatedOnToolsVersion = 26.6;
 					};
 					AEF54403302E8696000A6CB0 = {
-						CreatedOnToolsVersion = 26.6;
-						TestTargetID = AEF543F4302E8694000A6CB0;
-					};
-					AEF5440D302E8696000A6CB0 = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = AEF543F4302E8694000A6CB0;
 					};
@@ -226,7 +179,6 @@
 			targets = (
 				AEF543F4302E8694000A6CB0 /* GS-NearbyPlacesExplorer */,
 				AEF54403302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests */,
-				AEF5440D302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -240,13 +192,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AEF54402302E8696000A6CB0 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		AEF5440C302E8696000A6CB0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -270,13 +215,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AEF5440A302E8696000A6CB0 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -284,11 +222,6 @@
 			isa = PBXTargetDependency;
 			target = AEF543F4302E8694000A6CB0 /* GS-NearbyPlacesExplorer */;
 			targetProxy = AEF54405302E8696000A6CB0 /* PBXContainerItemProxy */;
-		};
-		AEF54410302E8696000A6CB0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AEF543F4302E8694000A6CB0 /* GS-NearbyPlacesExplorer */;
-			targetProxy = AEF5440F302E8696000A6CB0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -561,58 +494,6 @@
 			};
 			name = Release;
 		};
-		AEF5441F302E8696000A6CB0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 61B062AAA108A37C64AF03D4 /* Debug.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = T7Y5943DL2;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				MACOSX_DEPLOYMENT_TARGET = 26.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.guerra.GS-NearbyPlacesExplorerUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = "GS-NearbyPlacesExplorer";
-				XROS_DEPLOYMENT_TARGET = 26.5;
-			};
-			name = Debug;
-		};
-		AEF54420302E8696000A6CB0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = B00139BD19BDAF55863ECE09 /* Release.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = T7Y5943DL2;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
-				MACOSX_DEPLOYMENT_TARGET = 26.5;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.guerra.GS-NearbyPlacesExplorerUITests";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
-				TEST_TARGET_NAME = "GS-NearbyPlacesExplorer";
-				XROS_DEPLOYMENT_TARGET = 26.5;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -639,15 +520,6 @@
 			buildConfigurations = (
 				AEF5441C302E8696000A6CB0 /* Debug */,
 				AEF5441D302E8696000A6CB0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		AEF5441E302E8696000A6CB0 /* Build configuration list for PBXNativeTarget "GS-NearbyPlacesExplorerUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				AEF5441F302E8696000A6CB0 /* Debug */,
-				AEF54420302E8696000A6CB0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
