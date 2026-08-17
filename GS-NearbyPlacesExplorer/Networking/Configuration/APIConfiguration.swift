@@ -52,6 +52,11 @@ public struct DefaultHTTPConfiguration: HTTPConfiguration {
     result["Content-Type"] = "application/json"
     result["Accept"] = "application/json"
     
+    // Some backend APIs require a proper User-Agent
+    let cleanAppName = AppInfo.appName.isEmpty ? "GS-NearbyPlacesExplorer" : AppInfo.appName
+    let cleanVersion = AppInfo.shortVersion.isEmpty ? "1.0" : AppInfo.shortVersion
+    result["User-Agent"] = "\(cleanAppName)/\(cleanVersion)"
+    
     return result
   }
   
