@@ -227,27 +227,27 @@ command_log:
   started_at: 2026-08-16T20:49:04Z
   ended_at: 2026-08-16T20:49:50Z
 - command: /self-review
-  started_at: 2026-08-16T20:55:00Z
-  ended_at: 2026-08-16T20:58:00Z
+  started_at: 2026-08-16T21:10:00Z
+  ended_at: 2026-08-16T21:11:30Z
   dispatches:
     - subagent: aias-correctness-reviewer
-      started_at: 2026-08-16T20:55:10Z
-      ended_at: 2026-08-16T20:55:30Z
+      started_at: 2026-08-16T21:10:05Z
+      ended_at: 2026-08-16T21:10:15Z
     - subagent: aias-quality-reviewer
-      started_at: 2026-08-16T20:55:30Z
-      ended_at: 2026-08-16T20:55:50Z
+      started_at: 2026-08-16T21:10:15Z
+      ended_at: 2026-08-16T21:10:25Z
     - subagent: aias-architecture-reviewer
-      started_at: 2026-08-16T20:55:50Z
-      ended_at: 2026-08-16T20:56:10Z
+      started_at: 2026-08-16T21:10:25Z
+      ended_at: 2026-08-16T21:10:35Z
     - subagent: aias-test-auditor
-      started_at: 2026-08-16T20:56:10Z
-      ended_at: 2026-08-16T20:56:30Z
+      started_at: 2026-08-16T21:10:35Z
+      ended_at: 2026-08-16T21:10:45Z
     - subagent: aias-security-auditor
-      started_at: 2026-08-16T20:56:30Z
-      ended_at: 2026-08-16T20:56:50Z
+      started_at: 2026-08-16T21:10:45Z
+      ended_at: 2026-08-16T21:10:55Z
     - subagent: aias-reflector
-      started_at: 2026-08-16T20:56:50Z
-      ended_at: 2026-08-16T20:57:10Z
+      started_at: 2026-08-16T21:10:55Z
+      ended_at: 2026-08-16T21:11:05Z
 - command: /commit
   started_at: 2026-08-16T21:06:27Z
   ended_at: 2026-08-16T21:07:28Z
