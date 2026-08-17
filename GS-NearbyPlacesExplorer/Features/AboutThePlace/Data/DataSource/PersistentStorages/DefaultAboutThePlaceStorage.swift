@@ -22,17 +22,15 @@ public final class DefaultAboutThePlaceStorage: AboutThePlaceLocalDataSource, @u
     
     public func getPlaceDetails(osmId: Int) async -> AboutThePlaceEntity? {
         let key = NSNumber(value: osmId)
-        lock.lock()
-        defer { lock.unlock() }
-        
-        return cache.object(forKey: key)?.entity
+        return lock.withLock {
+            cache.object(forKey: key)?.entity
+        }
     }
     
     public func savePlaceDetails(_ entity: AboutThePlaceEntity) async {
         let key = NSNumber(value: entity.osmId)
-        lock.lock()
-        defer { lock.unlock() }
-        
-        cache.setObject(AboutThePlaceEntityWrapper(entity: entity), forKey: key)
+        lock.withLock {
+            cache.setObject(AboutThePlaceEntityWrapper(entity: entity), forKey: key)
+        }
     }
 }
