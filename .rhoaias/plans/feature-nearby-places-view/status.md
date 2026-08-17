@@ -28,6 +28,12 @@ artifacts:
   increments.plan.md: modified
   specs.design.md: modified
   review.remediation.md: modified
+execution_logs:
+- 2026-08-15: Began task planning. Discovered that the app currently mocks locations without API access. Proposed migrating to `Overpass API` to fetch real OpenStreetMap data dynamically.
+- 2026-08-16: Validated plan via `/validate-plan`. Discovered structural mismatch and test coverage gaps. Updated the plan to reflect real `PlaceListCell` logic, add parsing edge-case coverage, and inject proper location coordinates.
+- 2026-08-16: Updated plan with feedback from validation. Ready for execution.
+- 2026-08-16 (Inc 10-12): Initialized `DefaultHTTPConfiguration` with `User-Agent` support and created `OSMOpeningHoursParser` for string-based rule parsing, fully verified by unit tests.
+- 2026-08-16 (Inc 13-14): Created `NearbyPlacesAPIRouter` and `OverpassResponse` DTO. Refactored `NearbyPlacesService` to use `APIRequestDispatching`. Updated `NearbyPlacesModel` and `NearbyPlacesEntity` to handle `PlaceOpeningState`, and mapped this into the `PlaceListCell` UI. All 43 tests pass.
 command_log:
 - command: /remediation
   started_at: 2026-08-16T21:53:00Z
@@ -176,3 +182,41 @@ command_log:
   - command: /validate-plan
     started_at: 2026-08-17T00:26:24Z
     ended_at: 2026-08-17T00:26:25Z
+- command: /implement
+  increment: Increment 8
+  started_at: 2026-08-17T00:32:00Z
+  ended_at: 2026-08-17T00:34:19Z
+  outcome: completed
+- command: /implement
+  increment: Increment 9
+  started_at: 2026-08-17T00:34:48Z
+  ended_at: 2026-08-17T00:37:06Z
+  outcome: completed
+- command: /implement
+  increment: Increment 10
+  started_at: 2026-08-17T00:37:49Z
+  ended_at: 2026-08-17T00:42:27Z
+  outcome: completed
+- command: /implement
+  increment: Increment 11
+  started_at: 2026-08-17T00:55:46Z
+  ended_at: 2026-08-17T00:59:26Z
+  outcome: completed
+- command: /implement
+  increment: Increment 12
+  started_at: 2026-08-17T01:05:51Z
+  ended_at: 2026-08-17T01:08:45Z
+  outcome: completed
+- command: /implement
+  increment: Increment 13
+  started_at: 2026-08-17T01:12:00Z
+  ended_at: 2026-08-17T01:34:00Z
+  outcome: completed
+- command: /implement
+  increment: Increment 14
+  started_at: 2026-08-17T01:34:00Z
+  ended_at: 2026-08-17T01:45:00Z
+  outcome: completed
+- command: /implement
+  started_at: 2026-08-17T00:32:00Z
+  ended_at: 2026-08-17T01:45:00Z
