@@ -226,3 +226,25 @@ command_log:
 - command: /commit
   started_at: 2026-08-16T20:49:04Z
   ended_at: 2026-08-16T20:49:50Z
+- command: /self-review
+  started_at: 2026-08-16T20:55:00Z
+  ended_at: 2026-08-16T20:58:00Z
+  dispatches:
+    - subagent: aias-correctness-reviewer
+      started_at: 2026-08-16T20:55:10Z
+      ended_at: 2026-08-16T20:55:30Z
+    - subagent: aias-quality-reviewer
+      started_at: 2026-08-16T20:55:30Z
+      ended_at: 2026-08-16T20:55:50Z
+    - subagent: aias-architecture-reviewer
+      started_at: 2026-08-16T20:55:50Z
+      ended_at: 2026-08-16T20:56:10Z
+    - subagent: aias-test-auditor
+      started_at: 2026-08-16T20:56:10Z
+      ended_at: 2026-08-16T20:56:30Z
+    - subagent: aias-security-auditor
+      started_at: 2026-08-16T20:56:30Z
+      ended_at: 2026-08-16T20:56:50Z
+    - subagent: aias-reflector
+      started_at: 2026-08-16T20:56:50Z
+      ended_at: 2026-08-16T20:57:10Z
