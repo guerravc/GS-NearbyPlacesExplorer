@@ -21,10 +21,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		61B062AAA108A37C64AF03D4 /* Debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = "GS-NearbyPlacesExplorer/App/Config/Debug.xcconfig"; sourceTree = "<group>"; };
 		AEF543F5302E8694000A6CB0 /* GS-NearbyPlacesExplorer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GS-NearbyPlacesExplorer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AEF54404302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GS-NearbyPlacesExplorerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		B00139BD19BDAF55863ECE09 /* Release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = "GS-NearbyPlacesExplorer/App/Config/Release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -80,8 +78,6 @@
 				AEF543F7302E8694000A6CB0 /* GS-NearbyPlacesExplorer */,
 				AEF54407302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests */,
 				AEF543F6302E8694000A6CB0 /* Products */,
-				61B062AAA108A37C64AF03D4 /* Debug.xcconfig */,
-				B00139BD19BDAF55863ECE09 /* Release.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -228,7 +224,6 @@
 /* Begin XCBuildConfiguration section */
 		AEF54416302E8696000A6CB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 61B062AAA108A37C64AF03D4 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -291,7 +286,6 @@
 		};
 		AEF54417302E8696000A6CB0 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B00139BD19BDAF55863ECE09 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -346,7 +340,6 @@
 		};
 		AEF54419302E8696000A6CB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 61B062AAA108A37C64AF03D4 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -394,7 +387,6 @@
 		};
 		AEF5441A302E8696000A6CB0 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B00139BD19BDAF55863ECE09 /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -442,7 +434,6 @@
 		};
 		AEF5441C302E8696000A6CB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 61B062AAA108A37C64AF03D4 /* Debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -469,7 +460,6 @@
 		};
 		AEF5441D302E8696000A6CB0 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B00139BD19BDAF55863ECE09 /* Release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
