@@ -28,15 +28,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		61B062AAA108A37C64AF03D4 /* Debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = "GS-NearbyPlacesExplorer/App/Config/Debug.xcconfig"; sourceTree = "<group>"; };
 		AEF543F5302E8694000A6CB0 /* GS-NearbyPlacesExplorer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GS-NearbyPlacesExplorer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AEF54404302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GS-NearbyPlacesExplorerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AEF5440E302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GS-NearbyPlacesExplorerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B00139BD19BDAF55863ECE09 /* Release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = "GS-NearbyPlacesExplorer/App/Config/Release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		AE4CA62F3030059F00FFE2FE /* Exceptions for "GS-NearbyPlacesExplorer" folder in "GS-NearbyPlacesExplorer" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				App/Config/Debug.xcconfig,
+				App/Config/Release.xcconfig,
 				App/Info.plist,
 			);
 			target = AEF543F4302E8694000A6CB0 /* GS-NearbyPlacesExplorer */;
@@ -97,6 +101,8 @@
 				AEF54407302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests */,
 				AEF54411302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests */,
 				AEF543F6302E8694000A6CB0 /* Products */,
+				61B062AAA108A37C64AF03D4 /* Debug.xcconfig */,
+				B00139BD19BDAF55863ECE09 /* Release.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -153,8 +159,6 @@
 				AEF54407302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests */,
 			);
 			name = "GS-NearbyPlacesExplorerTests";
-			packageProductDependencies = (
-			);
 			productName = "GS-NearbyPlacesExplorerTests";
 			productReference = AEF54404302E8696000A6CB0 /* GS-NearbyPlacesExplorerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -176,8 +180,6 @@
 				AEF54411302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests */,
 			);
 			name = "GS-NearbyPlacesExplorerUITests";
-			packageProductDependencies = (
-			);
 			productName = "GS-NearbyPlacesExplorerUITests";
 			productReference = AEF5440E302E8696000A6CB0 /* GS-NearbyPlacesExplorerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
@@ -293,6 +295,7 @@
 /* Begin XCBuildConfiguration section */
 		AEF54416302E8696000A6CB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 61B062AAA108A37C64AF03D4 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -355,6 +358,7 @@
 		};
 		AEF54417302E8696000A6CB0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B00139BD19BDAF55863ECE09 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -409,6 +413,7 @@
 		};
 		AEF54419302E8696000A6CB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 61B062AAA108A37C64AF03D4 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -456,6 +461,7 @@
 		};
 		AEF5441A302E8696000A6CB0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B00139BD19BDAF55863ECE09 /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -503,6 +509,7 @@
 		};
 		AEF5441C302E8696000A6CB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 61B062AAA108A37C64AF03D4 /* Debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -529,6 +536,7 @@
 		};
 		AEF5441D302E8696000A6CB0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B00139BD19BDAF55863ECE09 /* Release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -555,6 +563,7 @@
 		};
 		AEF5441F302E8696000A6CB0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 61B062AAA108A37C64AF03D4 /* Debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -580,6 +589,7 @@
 		};
 		AEF54420302E8696000A6CB0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B00139BD19BDAF55863ECE09 /* Release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
