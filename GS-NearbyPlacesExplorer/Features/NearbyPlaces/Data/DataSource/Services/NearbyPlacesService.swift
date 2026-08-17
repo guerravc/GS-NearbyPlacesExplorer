@@ -1,39 +1,42 @@
 import Foundation
-import MapKit
 
-public final class NearbyPlacesService: NearbyPlacesRemoteDataSource {
+public final class NearbyPlacesService: NearbyPlacesRemoteDataSource, @unchecked Sendable {
+    @Inject var dispatcher: APIRequestDispatching
+    
     public init() {}
     
     public func search(latitude: Double, longitude: Double, query: String?) async throws -> [NearbyPlacesModel] {
-        let request = MKLocalSearch.Request()
+        // The query string is ignored in this Overpass implementation as we search by amenity.
+        let route = NearbyPlacesAPIRouter.fetchPlaces(latitude: latitude, longitude: longitude, radius: 1000)
         
-        if let query = query, !query.isEmpty {
-            request.naturalLanguageQuery = query
-        } else {
-            request.pointOfInterestFilter = .includingAll
-        }
+        let result = await dispatcher.perform(route)
         
-        let span = MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-        let region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: latitude, longitude: longitude), span: span)
-        request.region = region
-        
-        let search = MKLocalSearch(request: request)
-        let response = try await search.start()
-        
-        return response.mapItems.compactMap { item in
-            let location = item.location
-            let address = item.addressRepresentations?.fullAddress(
-                includingRegion: false,
-                singleLine: true
-            )
-            return NearbyPlacesModel(
-                id: item.identifier.map { String(describing: $0) } ?? UUID().uuidString,
-                name: item.name,
-                latitude: location.coordinate.latitude,
-                longitude: location.coordinate.longitude,
-                pointOfInterestCategory: item.pointOfInterestCategory?.rawValue,
-                title: address
-            )
+        switch result {
+        case .success(let response):
+            let decoder = JSONDecoder()
+            do {
+                let overpassResponse = try decoder.decode(OverpassResponse.self, from: response.data)
+                
+                return overpassResponse.elements.map { element in
+                    let name = element.tags?.name ?? "Unknown Location"
+                    let category = element.tags?.amenity ?? "unknown"
+                    let openingState = OSMOpeningHoursParser.state(for: element.tags?.openingHours)
+                    
+                    return NearbyPlacesModel(
+                        id: String(element.id),
+                        name: name,
+                        latitude: element.lat,
+                        longitude: element.lon,
+                        pointOfInterestCategory: category,
+                        title: nil, // Overpass doesn't provide a formatted address easily in this query
+                        openingState: openingState
+                    )
+                }
+            } catch {
+                throw NetworkError.decodingError(error)
+            }
+        case .failure(let error):
+            throw error
         }
     }
 }
