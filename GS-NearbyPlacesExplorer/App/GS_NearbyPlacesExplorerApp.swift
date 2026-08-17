@@ -21,6 +21,7 @@ struct GS_NearbyPlacesExplorerApp: App {
     @Provider var nearbyPlacesService: NearbyPlacesRemoteDataSource = NearbyPlacesService()
     @Provider var nearbyPlacesGateway: NearbyPlacesGateway = NearbyPlacesRepository()
     @Provider var fetchNearbyPlacesUC: any FetchNearbyPlacesUC = FetchNearbyPlacesUCImpl()
+    @Provider var dispatcher: APIRequestDispatching = APIRequestDispatcher()
     
     @State private var router = AppRouter()
     @State private var loginViewModel: LoginViewModel
