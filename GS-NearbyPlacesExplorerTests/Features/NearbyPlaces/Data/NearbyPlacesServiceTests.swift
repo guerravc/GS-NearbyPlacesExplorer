@@ -76,4 +76,33 @@ final class NearbyPlacesServiceTests: XCTestCase {
             // Success
         }
     }
+
+    func test_search_usesWayCenterWhenTheResponseContainsAWay() async throws {
+        let dispatcher = MockAPIRequestDispatcher()
+        let service = NearbyPlacesService()
+        service.dispatcher = dispatcher
+
+        let jsonResponse = """
+        {
+          "elements": [
+            {
+              "type": "way",
+              "id": 456,
+              "center": { "lat": 19.43, "lon": -99.13 },
+              "tags": { "amenity": "restaurant", "name": "Test Restaurant" }
+            }
+          ]
+        }
+        """
+        let response = HTTPURLResponse(
+            url: URL(string: "https://test.com")!, statusCode: 200, httpVersion: nil, headerFields: nil
+        )!
+        dispatcher.performResult = .success(APIResponse(data: Data(jsonResponse.utf8), urlResponse: response))
+
+        let models = try await service.search(latitude: 19.4326, longitude: -99.1332, query: nil)
+
+        XCTAssertEqual(models.count, 1)
+        XCTAssertEqual(models[0].latitude, 19.43)
+        XCTAssertEqual(models[0].longitude, -99.13)
+    }
 }
