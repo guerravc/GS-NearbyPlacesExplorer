@@ -314,7 +314,7 @@ public struct NearbyPlacesView: View {
       address: "Calle 1"),
     NearbyPlacesEntity(
       id: "2", name: "Restaurante Central", coordinate: (19.44, -99.14), category: "restaurant",
-      address: "Avenida 2"),
+      address: "Avenida 2")
   ])
   return NearbyPlacesView(viewModel: vm)
     .environment(AppRouter())
