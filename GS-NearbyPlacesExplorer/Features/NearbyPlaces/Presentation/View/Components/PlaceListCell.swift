@@ -23,6 +23,22 @@ public struct PlaceListCell: View {
         return formatter.string(from: measurement)
     }
     
+    private var scheduleText: String {
+        switch model.openingState {
+        case .open: return "Abierto"
+        case .closed: return "Cerrado"
+        case .notAvailable: return "Horario no disponible"
+        }
+    }
+    
+    private var scheduleColor: Color {
+        switch model.openingState {
+        case .open: return .green
+        case .closed: return .red
+        case .notAvailable: return .secondary
+        }
+    }
+    
     public var body: some View {
         HStack(spacing: 12) {
             Image(systemName: POICategoryMapper.map(category: model.category))
@@ -43,7 +59,8 @@ public struct PlaceListCell: View {
                         Text(distanceText)
                         Text("•")
                     }
-                    Text("Horario no disponible")
+                    Text(scheduleText)
+                        .foregroundColor(scheduleColor)
                 }
                 .font(.subheadline)
                 .foregroundColor(.secondary)
