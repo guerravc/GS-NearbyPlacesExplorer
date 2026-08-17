@@ -326,10 +326,10 @@ public struct NearbyPlacesView: View {
   let vm = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
   vm.state = .loaded([
     NearbyPlacesEntity(
-      id: "1", name: "El Buen Café", coordinate: (19.43, -99.13), category: "MKPOICategoryCafe",
+      id: "1", name: "El Buen Café", coordinate: (19.43, -99.13), category: "cafe",
       address: "Calle 1"),
     NearbyPlacesEntity(
-      id: "2", name: "Parque Central", coordinate: (19.44, -99.14), category: "MKPOICategoryPark",
+      id: "2", name: "Restaurante Central", coordinate: (19.44, -99.14), category: "restaurant",
       address: "Avenida 2"),
   ])
   return NearbyPlacesView(viewModel: vm)
