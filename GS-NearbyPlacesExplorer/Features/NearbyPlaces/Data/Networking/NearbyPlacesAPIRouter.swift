@@ -23,7 +23,7 @@ nonisolated public enum NearbyPlacesAPIRouter: APIRouter {
         case let .fetchPlaces(lat, lon, radius, query):
             let filter = overpassFilter(for: query)
             let query = """
-            [out:json][timeout:25];
+            [out:json][timeout:60];
             (
               node[\(filter)](around:\(radius),\(lat),\(lon));
               way[\(filter)](around:\(radius),\(lat),\(lon));

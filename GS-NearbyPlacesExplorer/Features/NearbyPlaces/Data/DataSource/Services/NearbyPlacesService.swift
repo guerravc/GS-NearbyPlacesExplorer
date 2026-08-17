@@ -9,7 +9,7 @@ public final class NearbyPlacesService: NearbyPlacesRemoteDataSource, @unchecked
         let route = NearbyPlacesAPIRouter.fetchPlaces(
             latitude: latitude,
             longitude: longitude,
-            radius: 2000,
+            radius: 1000,
             query: query
         )
         
