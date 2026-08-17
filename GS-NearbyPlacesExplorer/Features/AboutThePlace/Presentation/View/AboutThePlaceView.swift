@@ -68,25 +68,7 @@ public struct AboutThePlaceView: View {
         ZStack {
             // Main Content
             VStack(spacing: 0) {
-                // Header Image or Map
-                if let details = viewModel.placeDetails {
-                    Map(position: .constant(.region(MKCoordinateRegion(
-                        center: CLLocationCoordinate2D(latitude: details.coordinate.lat, longitude: details.coordinate.lon),
-                        span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
-                    )))) {
-                        Marker(details.name == "Unknown" ? placeName : details.name, coordinate: CLLocationCoordinate2D(latitude: details.coordinate.lat, longitude: details.coordinate.lon))
-                    }
-                    .disabled(true)
-                    .frame(height: 250)
-                } else {
-                    ZStack {
-                        Color(red: 0.85, green: 0.95, blue: 0.85) // Pastel green
-                        Image(systemName: "map.fill")
-                            .font(.system(size: 60))
-                            .foregroundColor(Color(red: 0.2, green: 0.6, blue: 0.2)) // Darker green
-                    }
-                    .frame(height: 250)
-                }
+                headerView
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
@@ -104,36 +86,7 @@ public struct AboutThePlaceView: View {
                                 .foregroundColor(.secondary)
                         }
                         
-                        // Two yellow boxes
-                        HStack(spacing: 16) {
-                            // Rating Box
-                            HStack {
-                                Image(systemName: "star.fill")
-                                    .foregroundColor(.orange)
-                                Text(viewModel.placeDetails != nil ? "4.5" : "Cargando...")
-                                    .font(viewModel.placeDetails != nil ? .body : .caption)
-                                    .bold()
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .padding(.vertical, 12)
-                            .background(Color.yellow.opacity(0.2))
-                            .cornerRadius(12)
-                            
-                            // Open Status Box
-                            HStack {
-                                let status = openStatusData
-                                Image(systemName: "door.left.hand.open")
-                                    .foregroundColor(status.color)
-                                Text(status.text)
-                                    .font(viewModel.placeDetails != nil ? .subheadline : .caption)
-                                    .bold()
-                            }
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .padding(.vertical, 12)
-                            .background(Color.yellow.opacity(0.2))
-                            .cornerRadius(12)
-                        }
-                        .fixedSize(horizontal: false, vertical: true)
+                        infoBoxesView
                         
                         Divider()
                         
@@ -156,23 +109,7 @@ public struct AboutThePlaceView: View {
                     .padding()
                 }
                 
-                // Bottom Button
-                Button(action: {
-                    viewModel.toggleFavorite()
-                }) {
-                    HStack {
-                        Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(viewModel.isFavorite ? .red : .gray)
-                        Text(viewModel.isFavorite ? "Desmarcar como favorito" : "Marcar como favorito")
-                            .foregroundColor(.primary)
-                            .bold()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color(UIColor.systemGray6))
-                    .cornerRadius(16)
-                    .padding()
-                }
+                bottomFavoriteButton
             }
             
             // Loading Overlay
@@ -228,6 +165,86 @@ public struct AboutThePlaceView: View {
                 guard let osmId = Int(placeId) else { return }
                 await viewModel.onAppear(osmId: osmId)
             }
+        }
+    }
+
+    // MARK: - Subcomponents
+
+    private var headerView: some View {
+        Group {
+            if let details = viewModel.placeDetails {
+                Map(position: .constant(.region(MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: details.coordinate.lat, longitude: details.coordinate.lon),
+                    span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                )))) {
+                    Marker(
+                        details.name == "Unknown" ? placeName : details.name,
+                        coordinate: CLLocationCoordinate2D(
+                            latitude: details.coordinate.lat,
+                            longitude: details.coordinate.lon
+                        )
+                    )
+                }
+                .disabled(true)
+                .frame(height: 250)
+            } else {
+                ZStack {
+                    Color(red: 0.85, green: 0.95, blue: 0.85)
+                    Image(systemName: "map.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(Color(red: 0.2, green: 0.6, blue: 0.2))
+                }
+                .frame(height: 250)
+            }
+        }
+    }
+
+    private var infoBoxesView: some View {
+        HStack(spacing: 16) {
+            HStack {
+                Image(systemName: "star.fill")
+                    .foregroundColor(.orange)
+                Text(viewModel.placeDetails != nil ? "4.5" : "Cargando...")
+                    .font(viewModel.placeDetails != nil ? .body : .caption)
+                    .bold()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.vertical, 12)
+            .background(Color.yellow.opacity(0.2))
+            .cornerRadius(12)
+
+            HStack {
+                let status = openStatusData
+                Image(systemName: "door.left.hand.open")
+                    .foregroundColor(status.color)
+                Text(status.text)
+                    .font(viewModel.placeDetails != nil ? .subheadline : .caption)
+                    .bold()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.vertical, 12)
+            .background(Color.yellow.opacity(0.2))
+            .cornerRadius(12)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var bottomFavoriteButton: some View {
+        Button(action: {
+            viewModel.toggleFavorite()
+        }) {
+            HStack {
+                Image(systemName: viewModel.isFavorite ? "heart.fill" : "heart")
+                    .foregroundColor(viewModel.isFavorite ? .red : .gray)
+                Text(viewModel.isFavorite ? "Desmarcar como favorito" : "Marcar como favorito")
+                    .foregroundColor(.primary)
+                    .bold()
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color(UIColor.systemGray6))
+            .cornerRadius(16)
+            .padding()
         }
     }
 }
