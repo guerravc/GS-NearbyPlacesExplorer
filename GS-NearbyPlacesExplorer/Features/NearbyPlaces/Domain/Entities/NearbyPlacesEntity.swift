@@ -13,12 +13,14 @@ public struct NearbyPlacesEntity: Identifiable, Sendable, Equatable, Hashable {
     public let coordinate: (latitude: Double, longitude: Double)
     public let category: String
     public let address: String?
+    public let openingState: PlaceOpeningState
     
-    public init(id: String, name: String, coordinate: (latitude: Double, longitude: Double), category: String, address: String?) {
+    public init(id: String, name: String, coordinate: (latitude: Double, longitude: Double), category: String, address: String?, openingState: PlaceOpeningState = .notAvailable) {
         self.id = id
         self.name = name
         self.coordinate = coordinate
         self.category = category
         self.address = address
+        self.openingState = openingState
     }
 }
