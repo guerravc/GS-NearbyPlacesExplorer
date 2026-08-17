@@ -1,0 +1,2 @@
+API_SCHEME = https
+API_HOST = overpass-api.de
