@@ -132,3 +132,65 @@ version: 1.0.0
 
 ## Self Code Review
 (This section will be populated during the `/implement` phase as each increment is completed).
+
+### Increment Outcome: Increment 1 — Configure SwiftData & Persistence Layer
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::Increment 1 **Goal:** | Defined `@Model final class FavoritePlace` and added to `GS_NearbyPlacesExplorerApp` schema | pass |
+| Applicable invariants verified | required — BND-001 (Domain Isolation) | `FavoritePlace` is in Data layer, schema defines uniquely `id` | pass |
+| Boundary/dependency direction verified | not applicable — pure Data layer schema, no cross-layer DTOs | N/A | n/a |
+| Failure/stale/cancel/rollback paths verified | not applicable — declarative schema only | N/A | n/a |
+
+### Increment Verification: Increment 1 — Configure SwiftData & Persistence Layer
+
+Mechanism: Xcode MCP (`BuildProject`, `RunAllTests`)
+Build: SUCCESS
+Tests (full suite): 46 passed, 0 failed
+Styleguides: clean — validated against `docs/STYLEGUIDE-ARCHITECTURE.md` and `docs/STYLEGUIDE.md`
+
+### Increment Outcome: Increment 2 — Implement Data & Domain Layers for Networking
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::Increment 2 **Goal:** | Implemented `FetchPlaceDetailsUC`, `AboutThePlaceGateway`, `DefaultAboutThePlaceRepository`, and `DefaultAboutThePlaceService` | pass |
+| Applicable invariants verified | required — FAIL-002 (Missing Data Fallback) | Map maps optional tags to safely unwrap or fallback string `"Unknown"` and `0.0` lat/lon | pass |
+| Boundary/dependency direction verified | required — Architecture Styleguide | Domain layer only imports Foundation, doesn't depend on networking DTOs | pass |
+| Failure/stale/cancel/rollback paths verified | required — NSCache thread safety | Cache writes/reads are wrapped in `NSLock()` | pass |
+
+### Increment Verification: Increment 2 — Implement Data & Domain Layers for Networking
+
+Mechanism: Xcode MCP (`RunSomeTests`)
+Build: SUCCESS
+Tests (scoped): 1 passed (`DefaultAboutThePlaceServiceTests`)
+Styleguides: clean — validated against `docs/STYLEGUIDE-ARCHITECTURE.md` and `docs/STYLEGUIDE.md`
+
+### Increment Outcome: Increment 4 — Presentation Logic & ViewModel Orchestration
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::Increment 4 **Goal:** | Implemented `AboutThePlaceViewModel` managing `AboutThePlaceViewState` | pass |
+| Applicable invariants verified | required — BND-001 (Domain Isolation) | ViewModel correctly wraps `AboutThePlaceEntity` into `AboutThePlaceDetailModel` | pass |
+| Boundary/dependency direction verified | required — Architecture | ViewModel uses UseCases to orchestrate business logic | pass |
+| Failure/stale/cancel/rollback paths verified | required — FAIL-001 | State sets to `.error` when fetch details fails | pass |
+
+### Increment Verification: Increment 4 — Presentation Logic & ViewModel Orchestration
+
+Mechanism: Xcode MCP (`RunSomeTests`)
+Build: SUCCESS
+Tests (scoped): 2 passed (`AboutThePlaceViewModelTests`)
+Styleguides: clean — validated against `docs/STYLEGUIDE-ARCHITECTURE.md`
+
+### Increment Outcome: Increment 5 — UI Integration
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::Increment 5 **Goal:** | Implemented `AboutThePlaceView` and connected it in `NearbyPlacesView` | pass |
+| UI implemented | required — UI Guidelines | View displays loading, error, and loaded states with SF symbols | pass |
+| Routing verified | required | `navigationDestination` correctly triggers the detail view | pass |
+
+### Increment Verification: Increment 5 — UI Integration
+
+Mechanism: Xcode MCP (`RunSomeTests`)
+Build: SUCCESS
+Tests (scoped): 2 passed (`AboutThePlaceViewModelTests`)
