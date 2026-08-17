@@ -96,7 +96,7 @@ public struct NearbyPlacesView: View {
         text: $viewModel.query,
         isPresented: $isSearchPresented,
         placement: .navigationBarDrawer(displayMode: .always),
-        prompt: "Buscar lugares"
+        prompt: "Buscar lugares cercanos"
       )
       .searchPresentationToolbarBehavior(.avoidHidingContent)
       .onSubmit(of: .search) {
@@ -247,7 +247,7 @@ public struct NearbyPlacesView: View {
       Image(systemName: "location.slash.fill")
         .font(.system(size: 50))
         .foregroundColor(.red)
-      Text("Ubicación Denegada")
+      Text("Ubicación necesaria")
         .font(.title2).bold()
       Text(
         "Esta funcionalidad requiere acceso a tu ubicación. Por favor, habilítala en Configuración."
