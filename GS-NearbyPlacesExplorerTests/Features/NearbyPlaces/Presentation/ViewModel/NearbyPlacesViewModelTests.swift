@@ -39,10 +39,23 @@ final class NearbyPlacesViewModelTests: XCTestCase {
         let actualState = sut.state
         XCTAssertEqual(actualState, expectedState)
     }
+
+    func test_search_withHTTPError_showsServiceErrorState() async {
+        let mockUC = MockFetchNearbyPlacesUC()
+        mockUC.mockError = NetworkError.serverError(statusCode: .notFound, data: nil)
+
+        let sut = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
+        await sut.search(latitude: 0, longitude: 0, query: "Café")
+
+        XCTAssertEqual(
+            sut.state,
+            .error("El servicio de lugares respondió con el error 404.")
+        )
+    }
     
     func test_search_withSuccess_showsLoadedState() async {
         let mockUC = MockFetchNearbyPlacesUC()
-        let entity = NearbyPlacesEntity(id: "1", name: "Test Place", coordinate: (latitude: 10, longitude: 10), category: "MKPOICategoryRestaurant", address: "123 Main St")
+        let entity = NearbyPlacesEntity(id: "1", name: "Test Place", coordinate: (latitude: 10, longitude: 10), category: "restaurant", address: "123 Main St")
         mockUC.mockResult = [entity]
         
         let sut = NearbyPlacesViewModel(fetchNearbyPlacesUC: mockUC)
