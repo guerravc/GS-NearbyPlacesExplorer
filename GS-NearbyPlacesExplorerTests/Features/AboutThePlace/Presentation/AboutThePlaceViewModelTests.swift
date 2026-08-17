@@ -12,28 +12,28 @@ import Foundation
 @MainActor
 struct AboutThePlaceViewModelTests {
     
-    struct MockFetchPlaceDetailsUC: FetchPlaceDetailsUC {
+    nonisolated struct MockFetchPlaceDetailsUC: FetchPlaceDetailsUC {
         let result: Result<AboutThePlaceEntity, Error>
         func execute(_ input: Int) async -> Result<AboutThePlaceEntity, Error> {
             return result
         }
     }
     
-    struct MockCheckFavoriteStatusUC: CheckFavoriteStatusUC {
+    nonisolated struct MockCheckFavoriteStatusUC: CheckFavoriteStatusUC {
         let result: Result<Bool, Error>
         func execute(_ input: CheckFavoriteStatusInput) async -> Result<Bool, Error> {
             return result
         }
     }
     
-    struct MockToggleFavoritePlaceUC: ToggleFavoritePlaceUC {
+    nonisolated struct MockToggleFavoritePlaceUC: ToggleFavoritePlaceUC {
         var result: Result<Void, Error> = .success(())
         func execute(_ input: FavoritePlaceEntity) async -> Result<Void, Error> {
             return result
         }
     }
     
-    struct MockRestoreSignInUC: RestoreSignInUC {
+    nonisolated struct MockRestoreSignInUC: RestoreSignInUC {
         let result: Result<LoginEntity, Error>
         func execute() async -> Result<LoginEntity, Error> {
             return result
