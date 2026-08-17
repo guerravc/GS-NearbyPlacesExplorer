@@ -194,3 +194,55 @@ Styleguides: clean — validated against `docs/STYLEGUIDE-ARCHITECTURE.md`
 Mechanism: Xcode MCP (`RunSomeTests`)
 Build: SUCCESS
 Tests (scoped): 2 passed (`AboutThePlaceViewModelTests`)
+
+## Remediation increments
+
+### Increment 6: Extract monolithic UI sections into private sub-components (finding R001-F001: Minor, dev-fault)
+
+**Goal:** Extract distinct UI sections in `AboutThePlaceView` into private helper views to improve declarative code readability.
+
+**Steps:**
+  1. Extract the Header Map/Placeholder into a private `var headerView: some View`.
+     - What could go wrong: Accidentally dropping the Map `disabled(true)` modifier.
+     - Quick verification: The map remains non-interactive.
+     - Obligations: `INV-002`.
+  2. Extract the Rating and Status info boxes into a private `var infoBoxesView: some View`.
+     - What could go wrong: Layout breaks if spacing or fixed sizes are removed.
+     - Quick verification: The two yellow boxes remain perfectly symmetrical.
+     - Obligations: None.
+  3. Extract the bottom Favorite Button into a private `var bottomFavoriteButton: some View`.
+     - What could go wrong: Button action loses its binding to the ViewModel.
+     - Quick verification: Tapping the button still triggers `viewModel.toggleFavorite()`.
+     - Obligations: None.
+  4. Replace the inline UI code inside `body` with these newly extracted sub-components.
+     - What could go wrong: Main `ZStack` hierarchy and loading overlay order gets skewed.
+     - Quick verification: Overall UI visually matches the monolithic version exactly, and overlay still blocks interaction.
+     - Obligations: `INV-001`.
+
+**Files modified:**
+- `GS-NearbyPlacesExplorer/Features/AboutThePlace/Presentation/View/AboutThePlaceView.swift`
+
+**Files created:**
+- None — inline extraction to private properties.
+
+**Tests affected:**
+- None — purely structural UI refactor without behavioral changes.
+
+**Tests created:**
+- None — UI remains covered by existing tests and previews.
+
+### Increment Outcome: Increment 6 — Extract monolithic UI sections into private sub-components
+
+| Semantic check | Applicability and obligation source | Concrete evidence | Result |
+|---|---|---|---|
+| Goal achieved | required — increments.plan.md::Increment 6 **Goal:** | View extracted into `headerView`, `infoBoxesView`, `bottomFavoriteButton` in `AboutThePlaceView.swift:L232-315` | pass |
+| Applicable invariants verified | required — increments.plan.md::Increment 6 **Obligations:** | `INV-002` verified in `AboutThePlaceView.swift:L240` (`.disabled(true)` kept), `INV-001` verified in `AboutThePlaceView.swift:L188` (`.allowsHitTesting(false)` kept) | pass |
+| Boundary/dependency direction verified | not applicable — touched-scope: pure SwiftUI internal structural refactoring | N/A rationale: no cross-layer or domain dependencies added | n/a |
+| Failure/stale/cancel/rollback paths verified | not applicable — touched-scope: pure SwiftUI internal structural refactoring | N/A rationale: no mutation or concurrency changes | n/a |
+
+### Increment Verification: Increment 6 — Extract monolithic UI sections into private sub-components
+
+Mechanism: Xcode MCP (`RunAllTests` as scoped fallback)
+Build: SUCCESS
+Tests (scoped): 49 passed (`GS-NearbyPlacesExplorerTests`)
+Styleguides: clean — validated against: docs/
