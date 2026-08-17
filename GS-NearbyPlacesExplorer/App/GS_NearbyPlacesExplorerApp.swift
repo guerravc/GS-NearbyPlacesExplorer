@@ -23,6 +23,16 @@ struct GS_NearbyPlacesExplorerApp: App {
     @Provider var fetchNearbyPlacesUC: any FetchNearbyPlacesUC = FetchNearbyPlacesUCImpl()
     @Provider var dispatcher: APIRequestDispatching = APIRequestDispatcher()
     
+    @Provider var aboutThePlaceLocalDataSource: AboutThePlaceLocalDataSource = DefaultAboutThePlaceStorage()
+    @Provider var aboutThePlaceRemoteDataSource: AboutThePlaceRemoteDataSource = DefaultAboutThePlaceService()
+    @Provider var aboutThePlaceGateway: AboutThePlaceGateway = DefaultAboutThePlaceRepository()
+    @Provider var fetchPlaceDetailsUC: any FetchPlaceDetailsUC = FetchPlaceDetailsUCImpl()
+    
+    @Provider var favoritePlacesGateway: FavoritePlacesGateway = DefaultFavoritePlacesRepository()
+    @Provider var favoritePlacesLocalDataSource: FavoritePlacesLocalDataSource = DefaultFavoritePlacesStorage()
+    @Provider var checkFavoriteStatusUC: any CheckFavoriteStatusUC = CheckFavoriteStatusUCImpl()
+    @Provider var toggleFavoritePlaceUC: any ToggleFavoritePlaceUC = ToggleFavoritePlaceUCImpl()
+    
     @State private var router = AppRouter()
     @State private var loginViewModel: LoginViewModel
     
@@ -43,9 +53,9 @@ struct GS_NearbyPlacesExplorerApp: App {
         }
     }
     
-    var sharedModelContainer: ModelContainer = {
+    static let sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            FavoritePlace.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -69,6 +79,6 @@ struct GS_NearbyPlacesExplorerApp: App {
             .animation(.easeInOut, value: router.root)
             .environment(router)
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(Self.sharedModelContainer)
     }
 }
